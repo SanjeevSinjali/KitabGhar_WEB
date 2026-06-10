@@ -1,19 +1,36 @@
-import Cookies from "js-cookie";
+"use server";
 
-const TOKEN_KEY = "kitabghar_token";
+import { cookies } from "next/headers";
 
-export function setToken(token: string) {
-  Cookies.set(TOKEN_KEY, token, { expires: 7, secure: true, sameSite: "strict" });
+export async function setTokenCookie(token: string) {
+  const cookieStore = await cookies();
+  cookieStore.set({
+    name: "auth_token",
+    value: token,
+  });
 }
 
-export function getToken(): string | undefined {
-  return Cookies.get(TOKEN_KEY);
+export async function getTokenCookie() {
+  const cookieStore = await cookies();
+  return cookieStore.get("auth_token")?.value;
 }
 
-export function removeToken() {
-  Cookies.remove(TOKEN_KEY);
+export async function storeUserData(userData: unknown) {
+  const cookieStore = await cookies();
+  cookieStore.set({
+    name: "user_data",
+    value: JSON.stringify(userData),
+  });
 }
 
-export function isLoggedIn(): boolean {
-  return !!getToken();
+export async function getUserData() {
+  const cookieStore = await cookies();
+  const userDataCookie = cookieStore.get("user_data")?.value;
+  return userDataCookie ? JSON.parse(userDataCookie) : null;
+}
+
+export async function clearAuthCookies() {
+  const cookieStore = await cookies();
+  cookieStore.delete("auth_token");
+  cookieStore.delete("user_data");
 }
