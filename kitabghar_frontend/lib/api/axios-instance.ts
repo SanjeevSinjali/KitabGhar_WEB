@@ -1,14 +1,11 @@
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
-import { getToken } from "@/lib/cookies";
 
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000",
+  baseURL: "http://localhost:3000",
   headers: { "Content-Type": "application/json" },
 });
 
 axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = getToken();
-  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 

@@ -1,21 +1,18 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const BASE = "/api/v1";
 
 export const ENDPOINTS = {
   AUTH: {
-    LOGIN: `${BASE_URL}/api/auth/login`,
-    REGISTER: `${BASE_URL}/api/auth/register`,
-    LOGOUT: `${BASE_URL}/api/auth/logout`,
-    ME: `${BASE_URL}/api/auth/me`,
+    LOGIN: `${BASE}/auth/login`,
+    REGISTER: `${BASE}/auth/register`,
+    LOGOUT: `${BASE}/auth/logout`,
+    WHOAMI: `${BASE}/auth/whoami`,
+    UPDATE: `${BASE}/auth/update`,
   },
   BOOKS: {
-    LIST: `${BASE_URL}/api/books`,
-    CREATE: `${BASE_URL}/api/books`,
-    DETAIL: (id: string) => `${BASE_URL}/api/books/${id}`,
-    UPDATE: (id: string) => `${BASE_URL}/api/books/${id}`,
-    DELETE: (id: string) => `${BASE_URL}/api/books/${id}`,
-  },
-  USER: {
-    PROFILE: `${BASE_URL}/api/users/profile`,
-    UPDATE_PROFILE: `${BASE_URL}/api/users/profile`,
+    LIST: `${BASE}/books`,
+    CREATE: `${BASE}/books`,
+    DETAIL: (id: string) => `${BASE}/books/${id}`,
+    UPDATE: (id: string) => `${BASE}/books/${id}`,
+    DELETE: (id: string) => `${BASE}/books/${id}`,
   },
 };

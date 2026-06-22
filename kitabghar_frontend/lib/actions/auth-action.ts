@@ -1,13 +1,12 @@
 "use server";
-
-import { setTokenCookie, storeUserData, clearAuthCookies } from "@/lib/cookies";
+import { setTokenCookie, storeUserData, clearAuthCookies, getTokenCookie } from "@/lib/cookies";
 import { ENDPOINTS } from "@/lib/api/endpoints";
 
 export async function loginAction(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   try {
-    const res = await fetch(ENDPOINTS.AUTH.LOGIN, {
+    const res = await fetch(`http://localhost:5000${ENDPOINTS.AUTH.LOGIN}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
@@ -30,7 +29,7 @@ export async function registerAction(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   try {
-    const res = await fetch(ENDPOINTS.AUTH.REGISTER, {
+    const res = await fetch(`http://localhost:5000${ENDPOINTS.AUTH.REGISTER}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, password }),
@@ -51,4 +50,34 @@ export async function registerAction(formData: FormData) {
 export async function logoutAction() {
   await clearAuthCookies();
   return { success: true };
+}
+
+export async function whoamiAction() {
+  const token = await getTokenCookie();
+  if (!token) return null;
+
+  const res = await fetch(`http://localhost:5000${ENDPOINTS.AUTH.WHOAMI}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) return null;
+  const data = await res.json() as { success: boolean; data: { _id: string; name: string; email: string; avatar?: string } };
+  return data.data;
+}
+
+export async function updateProfileAction(formData: FormData) {
+  const token = await getTokenCookie();
+  const res = await fetch(`http://localhost:5000${ENDPOINTS.AUTH.UPDATE}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+  if (!res.ok) throw new Error("Update failed");
+  const data = await res.json() as { success: boolean; data: { _id: string; name: string; email: string; avatar?: string } };
+  return data.data;
 }
