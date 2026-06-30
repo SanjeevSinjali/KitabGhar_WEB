@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import path from "path";
 import { connectDB } from "./database/mongodb";
 import userRoutes from "./routes/user.route";
+import adminUserRoutes from "./routes/admin/user.route";
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use(cookieParser());
 app.use("/avatars", express.static(path.join(__dirname, "../public/avatars")));
 
 app.use("/api/v1/auth", userRoutes);
+app.use("/api/v1/admin/users", adminUserRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "KitabGhar API is running" });

@@ -5,7 +5,6 @@ import type { RegisterDTO, LoginDTO } from "../dtos/user.dto";
 import type { AuthResponse } from "../types/user.type";
 
 const JWT_SECRET = process.env.JWT_SECRET || "secret";
-console.log(JWT_SECRET)
 
 export async function registerService(data: RegisterDTO): Promise<AuthResponse> {
   const existing = await findUserByEmail(data.email);
@@ -16,12 +15,10 @@ export async function registerService(data: RegisterDTO): Promise<AuthResponse> 
 
   const userId = String(user._id);
   const token = jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: "7d" });
-  console.log(JWT_SECRET)
-
 
   return {
     token,
-    user: { id: userId, name: user.name, email: user.email },
+    user: { id: userId, name: user.name, email: user.email, role: user.role },
   };
 }
 
@@ -37,6 +34,6 @@ export async function loginService(data: LoginDTO): Promise<AuthResponse> {
 
   return {
     token,
-    user: { id: userId, name: user.name, email: user.email },
+    user: { id: userId, name: user.name, email: user.email, role: user.role },
   };
 }
