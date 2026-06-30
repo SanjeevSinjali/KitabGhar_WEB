@@ -15,10 +15,15 @@ export async function loginAction(formData: FormData) {
       const error = await res.json() as { message?: string };
       return { success: false, message: error.message || "Login failed" };
     }
-    const data = await res.json() as { token: string; user: { id: string; name: string; email: string } };
+    const data = await res.json() as {
+      token: string;
+      user: { id: string; name: string; email: string; role: string };
+    };
     await setTokenCookie(data.token);
     await storeUserData(data.user);
-    return { success: true, user: data.user };
+
+    const redirectTo = data.user.role === "admin" ? "/admin" : "/dashboard";
+    return { success: true, user: data.user, redirectTo };
   } catch {
     return { success: false, message: "Something went wrong." };
   }
@@ -38,10 +43,15 @@ export async function registerAction(formData: FormData) {
       const error = await res.json() as { message?: string };
       return { success: false, message: error.message || "Registration failed" };
     }
-    const data = await res.json() as { token: string; user: { id: string; name: string; email: string } };
+    const data = await res.json() as {
+      token: string;
+      user: { id: string; name: string; email: string; role: string };
+    };
     await setTokenCookie(data.token);
     await storeUserData(data.user);
-    return { success: true, user: data.user };
+
+    const redirectTo = data.user.role === "admin" ? "/admin" : "/dashboard";
+    return { success: true, user: data.user, redirectTo };
   } catch {
     return { success: false, message: "Something went wrong." };
   }
@@ -64,7 +74,10 @@ export async function whoamiAction() {
     },
   });
   if (!res.ok) return null;
-  const data = await res.json() as { success: boolean; data: { _id: string; name: string; email: string; avatar?: string } };
+  const data = await res.json() as {
+    success: boolean;
+    data: { _id: string; name: string; email: string; role: string; avatar?: string };
+  };
   return data.data;
 }
 
@@ -78,6 +91,9 @@ export async function updateProfileAction(formData: FormData) {
     body: formData,
   });
   if (!res.ok) throw new Error("Update failed");
-  const data = await res.json() as { success: boolean; data: { _id: string; name: string; email: string; avatar?: string } };
+  const data = await res.json() as {
+    success: boolean;
+    data: { _id: string; name: string; email: string; role: string; avatar?: string };
+  };
   return data.data;
 }

@@ -15,4 +15,13 @@ export const ENDPOINTS = {
     UPDATE: (id: string) => `${BASE}/books/${id}`,
     DELETE: (id: string) => `${BASE}/books/${id}`,
   },
+  ADMIN: {
+    USERS: {
+      LIST: `${BASE}/admin/users`,
+      GET: (id: string) => `${BASE}/admin/users/${id}`,
+      CREATE: `${BASE}/admin/users`,
+      UPDATE: (id: string) => `${BASE}/admin/users/${id}`,
+      DELETE: (id: string) => `${BASE}/admin/users/${id}`,
+    },
+  },
 };
