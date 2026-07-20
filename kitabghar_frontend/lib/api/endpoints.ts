@@ -11,6 +11,7 @@ export const ENDPOINTS = {
   BOOKS: {
     LIST: `${BASE}/books`,
     CREATE: `${BASE}/books`,
+    MINE: `${BASE}/books/mine`,
     DETAIL: (id: string) => `${BASE}/books/${id}`,
     UPDATE: (id: string) => `${BASE}/books/${id}`,
     DELETE: (id: string) => `${BASE}/books/${id}`,
@@ -27,6 +28,11 @@ export const ENDPOINTS = {
       LIST: `${BASE}/admin/notifications`,
       MARK_READ: (id: string) => `${BASE}/admin/notifications/${id}/read`,
       MARK_ALL_READ: `${BASE}/admin/notifications/read-all`,
+    },
+    BOOKS: {
+      LIST: `${BASE}/admin/books`,
+      GET: (id: string) => `${BASE}/admin/books/${id}`,
+      DELETE: (id: string) => `${BASE}/admin/books/${id}`,
     },
   },
 };
