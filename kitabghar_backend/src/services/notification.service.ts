@@ -22,6 +22,22 @@ export async function notifyProfileUpdate(
   });
 }
 
+export async function notifyBookListed(
+  sellerId: string,
+  sellerName: string,
+  bookTitle: string,
+  price: number
+) {
+  const message = `${sellerName} listed a new book "${bookTitle}" for Rs. ${price}.`;
+
+  return createNotification({
+    type: "book_listed",
+    message,
+    user: sellerId,
+    changedFields: ["book_listing"],
+  });
+}
+
 export async function listNotifications(page?: string, limit?: string) {
   const currentPage = page && parseInt(page) > 0 ? parseInt(page) : 1;
   const currentLimit = limit && parseInt(limit) > 0 ? parseInt(limit) : 10;
