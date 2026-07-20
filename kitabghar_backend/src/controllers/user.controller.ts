@@ -2,6 +2,7 @@ import type { Response } from "express";
 import type { Request } from "express-serve-static-core";
 import { registerService, loginService } from "../services/user.service";
 import { RegisterSchema, LoginSchema } from "../types/user.type";
+import { notifyProfileUpdate } from "../services/notification.service";
 import User from "../models/user.model";
 import bcrypt from "bcryptjs";
 
@@ -77,18 +78,31 @@ export async function updateProfile(
   res: Response
 ) {
   try {
+    const currentUser = await User.findById((req as any).user.id);
+    if (!currentUser) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
     const fieldsToUpdate: Record<string, string> = {};
+    const changedFields: string[] = [];
 
-    if (req.body.name) fieldsToUpdate.name = req.body.name;
-    if (req.body.email) fieldsToUpdate.email = req.body.email;
-
+    if (req.body.name && req.body.name !== currentUser.name) {
+      fieldsToUpdate.name = req.body.name;
+      changedFields.push("name");
+    }
+    if (req.body.email && req.body.email !== currentUser.email) {
+      fieldsToUpdate.email = req.body.email;
+      changedFields.push("email");
+    }
     if (req.body.password) {
       const salt = await bcrypt.genSalt(10);
       fieldsToUpdate.password = await bcrypt.hash(req.body.password, salt);
+      changedFields.push("password");
     }
-
     if (req.file) {
       fieldsToUpdate.avatar = `/avatars/${req.file.filename}`;
+      changedFields.push("avatar");
     }
 
     const user = await User.findByIdAndUpdate(
@@ -100,6 +114,10 @@ export async function updateProfile(
     if (!user) {
       res.status(404).json({ message: "User not found" });
       return;
+    }
+
+    if (changedFields.length > 0 && user.role !== "admin") {
+      await notifyProfileUpdate(String(user._id), user.name, changedFields);
     }
 
     res.status(200).json({ success: true, data: user });
