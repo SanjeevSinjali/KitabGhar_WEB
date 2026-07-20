@@ -95,5 +95,14 @@ export async function updateProfileAction(formData: FormData) {
     success: boolean;
     data: { _id: string; name: string; email: string; role: string; avatar?: string };
   };
+
+  await storeUserData({
+    id: data.data._id,
+    name: data.data.name,
+    email: data.data.email,
+    role: data.data.role,
+    avatar: data.data.avatar,
+  });
+
   return data.data;
 }

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getUserData } from "@/lib/cookies";
+import { redirect } from "next/navigation";
+import { whoamiAction } from "@/lib/actions/auth-action";
 import { BookOpen, ShoppingBag, PlusCircle, TrendingUp, Star, Package, Heart, Search } from "lucide-react";
 import LogoutButton from "@/app/_components/logoutbutton";
 
@@ -30,7 +31,11 @@ const conditionColors: Record<string, string> = {
 };
 
 export default async function DashboardPage() {
-  const user = await getUserData() ?? { id: "", name: "User", email: "" };
+  const user = await whoamiAction();
+
+  if (!user) {
+    redirect("/login");
+  }
 
   const initials = user.name
     .split(" ")
@@ -52,9 +57,15 @@ export default async function DashboardPage() {
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1E3A5F] text-sm font-semibold text-white">
-                {initials}
-              </div>
+              {user.avatar ? (
+                <div className="relative h-8 w-8 overflow-hidden rounded-full">
+                  <Image src={user.avatar} alt={user.name} fill className="object-cover" />
+                </div>
+              ) : (
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1E3A5F] text-sm font-semibold text-white">
+                  {initials}
+                </div>
+              )}
               <span className="text-sm font-medium text-slate-700">{user.name}</span>
             </div>
             <LogoutButton />
@@ -153,9 +164,15 @@ export default async function DashboardPage() {
           <div className="space-y-6">
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="flex flex-col items-center text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#1E3A5F] text-2xl font-bold text-white">
-                  {initials}
-                </div>
+                {user.avatar ? (
+                  <div className="relative h-16 w-16 overflow-hidden rounded-full">
+                    <Image src={user.avatar} alt={user.name} fill className="object-cover" />
+                  </div>
+                ) : (
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#1E3A5F] text-2xl font-bold text-white">
+                    {initials}
+                  </div>
+                )}
                 <h3 className="mt-3 font-semibold text-slate-900">{user.name}</h3>
                 <p className="text-sm text-slate-500">{user.email}</p>
                 <div className="mt-3 flex items-center gap-1 text-yellow-500">
@@ -173,9 +190,12 @@ export default async function DashboardPage() {
                   <p className="text-xs text-slate-500">Purchased</p>
                 </div>
               </div>
-              <button className="mt-4 w-full rounded-xl border border-slate-200 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+              <Link
+                href="/profile"
+                className="mt-4 block w-full rounded-xl border border-slate-200 py-2 text-center text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+              >
                 Edit Profile
-              </button>
+              </Link>
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

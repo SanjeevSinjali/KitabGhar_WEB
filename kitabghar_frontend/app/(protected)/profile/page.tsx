@@ -2,10 +2,12 @@
 
 import { useUser } from "@/context/UserContext";
 import { updateProfileAction } from "@/lib/actions/auth-action";
+import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 
 export default function ProfilePage() {
   const { user, setUser } = useUser();
+  const router = useRouter();
   const [name, setName] = useState(user?.name ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
   const [preview, setPreview] = useState<string | null>(user?.avatar ?? null);
@@ -34,6 +36,8 @@ export default function ProfilePage() {
       const updated = await updateProfileAction(fd);
       setUser(updated);
       setSuccess("Profile updated successfully!");
+      router.push("/dashboard");
+      router.refresh();
     } catch {
       setError("Failed to update profile.");
     }

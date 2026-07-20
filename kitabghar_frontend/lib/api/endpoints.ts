@@ -23,5 +23,10 @@ export const ENDPOINTS = {
       UPDATE: (id: string) => `${BASE}/admin/users/${id}`,
       DELETE: (id: string) => `${BASE}/admin/users/${id}`,
     },
+    NOTIFICATIONS: {
+      LIST: `${BASE}/admin/notifications`,
+      MARK_READ: (id: string) => `${BASE}/admin/notifications/${id}/read`,
+      MARK_ALL_READ: `${BASE}/admin/notifications/read-all`,
+    },
   },
 };
