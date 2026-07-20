@@ -2,8 +2,21 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { whoamiAction } from "@/lib/actions/auth-action";
-import { BookOpen, ShoppingBag, PlusCircle, TrendingUp, Star, Package, Heart, Search } from "lucide-react";
+import { handleGetMyBooks } from "@/lib/actions/book-action";
+import { BookOpen, ShoppingBag, Star, Package, Heart, Search } from "lucide-react";
 import LogoutButton from "@/app/_components/logoutbutton";
+import SellBookModal from "@/app/dashboard/_components/SellBookModal";
+
+type MyBook = {
+  _id: string;
+  title: string;
+  author: string;
+  price: number;
+  condition: "Like New" | "Good" | "Fair";
+  image: string;
+  status: "Active" | "Sold";
+  createdAt: string;
+};
 
 const browseBooks = [
   { id: 1, title: "Clean Code", author: "Robert C.Martin", price: "Rs. 1050", condition: "Good", image: "/book_1.jpg" },
@@ -14,28 +27,47 @@ const browseBooks = [
   { id: 6, title: "Database System Concepts", author: "Henry F.Korth", price: "Rs. 1050", condition: "Good", image: "/book_6.jpg" },
 ];
 
-const myListedBooks: { id: number; title: string; price: string; status: string; image: string }[] = [];
-const recentActivity: { id: number; type: string; text: string; time: string }[] = [];
-
-const stats = [
-  { label: "Books Browsed", value: "0", icon: BookOpen, color: "bg-blue-50 text-blue-600" },
-  { label: "Purchases", value: "0", icon: ShoppingBag, color: "bg-green-50 text-green-600" },
-  { label: "Wishlist", value: "0", icon: Heart, color: "bg-pink-50 text-pink-600" },
-  { label: "My Listings", value: "0", icon: Package, color: "bg-purple-50 text-purple-600" },
-];
-
 const conditionColors: Record<string, string> = {
   "Like New": "bg-green-100 text-green-700",
   "Good": "bg-blue-100 text-blue-700",
   "Fair": "bg-yellow-100 text-yellow-700",
 };
 
+function formatRelativeTime(dateStr: string) {
+  const date = new Date(dateStr);
+  const diffMs = Date.now() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins} min ago`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString();
+}
+
 export default async function DashboardPage() {
   const user = await whoamiAction();
-
   if (!user) {
     redirect("/login");
   }
+
+  const booksResult = await handleGetMyBooks();
+  const myListedBooks: MyBook[] = booksResult.success ? booksResult.data : [];
+
+  const recentActivity = myListedBooks.slice(0, 5).map((book) => ({
+    id: book._id,
+    type: "listed" as const,
+    text: `You listed "${book.title}" for Rs. ${book.price}`,
+    time: formatRelativeTime(book.createdAt),
+  }));
+
+  const stats = [
+    { label: "Books Browsed", value: "0", icon: BookOpen, color: "bg-blue-50 text-blue-600" },
+    { label: "Purchases", value: "0", icon: ShoppingBag, color: "bg-green-50 text-green-600" },
+    { label: "Wishlist", value: "0", icon: Heart, color: "bg-pink-50 text-pink-600" },
+    { label: "My Listings", value: String(myListedBooks.length), icon: Package, color: "bg-purple-50 text-purple-600" },
+  ];
 
   const initials = user.name
     .split(" ")
@@ -130,9 +162,7 @@ export default async function DashboardPage() {
           <div className="lg:col-span-2">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-slate-900">My Listings</h2>
-              <button className="flex items-center gap-1.5 rounded-xl bg-[#1E3A5F] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#162d4a]">
-                <PlusCircle size={15} /> Sell a Book
-              </button>
+              <SellBookModal />
             </div>
             <div className="space-y-3">
               {myListedBooks.length === 0 ? (
@@ -143,13 +173,13 @@ export default async function DashboardPage() {
                 </div>
               ) : (
                 myListedBooks.map((book) => (
-                  <div key={book.id} className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md">
+                  <div key={book._id} className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md">
                     <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-xl bg-slate-100">
                       <Image src={book.image} alt={book.title} fill sizes="48px" className="object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="truncate font-medium text-slate-900">{book.title}</p>
-                      <p className="text-sm text-slate-500">{book.price}</p>
+                      <p className="text-sm text-slate-500">Rs. {book.price}</p>
                     </div>
                     <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${book.status === "Active" ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-500"}`}>
                       {book.status}
@@ -182,7 +212,7 @@ export default async function DashboardPage() {
               </div>
               <div className="mt-5 grid grid-cols-2 gap-3 border-t border-slate-100 pt-5">
                 <div className="text-center">
-                  <p className="text-xl font-bold text-slate-900">0</p>
+                  <p className="text-xl font-bold text-slate-900">{myListedBooks.length}</p>
                   <p className="text-xs text-slate-500">Listed</p>
                 </div>
                 <div className="text-center">
@@ -208,7 +238,7 @@ export default async function DashboardPage() {
                 ) : (
                   recentActivity.map((item) => (
                     <div key={item.id} className="flex items-start gap-3">
-                      <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${item.type === "sold" ? "bg-green-100 text-green-600" : item.type === "bought" ? "bg-blue-100 text-blue-600" : "bg-purple-100 text-purple-600"}`}>
+                      <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-600">
                         <Package size={14} />
                       </div>
                       <div>
