@@ -27,6 +27,10 @@ const nextConfig: NextConfig = {
         source: "/avatars/:path*",
         destination: "http://localhost:5000/avatars/:path*",
       },
+      {
+        source: "/books/:path*",
+        destination: "http://localhost:5000/books/:path*",
+      },
     ];
   },
 };
