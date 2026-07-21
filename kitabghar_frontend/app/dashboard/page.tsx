@@ -254,38 +254,11 @@ export default async function DashboardPage() {
 
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="font-semibold text-slate-900">My Purchases</h3>
-                <Link href="/purchases" className="text-xs font-medium text-[#1E3A5F] hover:underline">
+                <h3 className="font-semibold text-slate-900">Recent Activity</h3>
+                <Link href="/activity" className="text-xs font-medium text-[#1E3A5F] hover:underline">
                   View all
                 </Link>
               </div>
-              <div className="space-y-3">
-                {purchases.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-center">
-                    <p className="text-sm text-slate-400">No purchases yet</p>
-                  </div>
-                ) : (
-                  purchases.slice(0, 5).map((item: any) => (
-                    <Link
-                      key={item._id}
-                      href="/purchases"
-                      className="flex items-center gap-3 rounded-lg transition hover:bg-slate-50 -mx-2 px-2 py-1"
-                    >
-                      <div className="relative h-12 w-9 shrink-0 overflow-hidden rounded-lg bg-slate-100">
-                        <Image src={item.image} alt={item.title} fill sizes="36px" className="object-cover" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-slate-900">{item.title}</p>
-                        <p className="text-xs text-slate-500">{item.price}</p>
-                      </div>
-                    </Link>
-                  ))
-                )}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h3 className="mb-4 font-semibold text-slate-900">Recent Activity</h3>
               <div className="space-y-4">
                 {recentActivity.length === 0 ? (
                   <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-center">

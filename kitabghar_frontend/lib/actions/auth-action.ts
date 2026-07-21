@@ -107,3 +107,45 @@ export async function updateProfileAction(formData: FormData) {
 
   return data.data;
 }
+
+export async function requestPasswordChangeAction(currentPassword: string) {
+  const token = await getTokenCookie();
+  try {
+    const res = await fetch(`http://localhost:5000${ENDPOINTS.AUTH.REQUEST_PASSWORD_CHANGE}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ currentPassword }),
+    });
+    const result = await res.json() as { success?: boolean; message?: string };
+    if (!res.ok) {
+      return { success: false, message: result.message || "Failed to send verification code" };
+    }
+    return { success: true, message: result.message || "Code sent" };
+  } catch {
+    return { success: false, message: "Something went wrong." };
+  }
+}
+
+export async function confirmPasswordChangeAction(data: { code: string; newPassword: string }) {
+  const token = await getTokenCookie();
+  try {
+    const res = await fetch(`http://localhost:5000${ENDPOINTS.AUTH.CONFIRM_PASSWORD_CHANGE}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    const result = await res.json() as { success?: boolean; message?: string };
+    if (!res.ok) {
+      return { success: false, message: result.message || "Failed to update password" };
+    }
+    return { success: true, message: result.message || "Password updated successfully" };
+  } catch {
+    return { success: false, message: "Something went wrong." };
+  }
+}

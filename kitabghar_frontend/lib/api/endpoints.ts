@@ -1,5 +1,4 @@
 const BASE = "/api/v1";
-
 export const ENDPOINTS = {
   AUTH: {
     LOGIN: `${BASE}/auth/login`,
@@ -7,6 +6,8 @@ export const ENDPOINTS = {
     LOGOUT: `${BASE}/auth/logout`,
     WHOAMI: `${BASE}/auth/whoami`,
     UPDATE: `${BASE}/auth/update`,
+    REQUEST_PASSWORD_CHANGE: `${BASE}/auth/change-password/request-code`,
+    CONFIRM_PASSWORD_CHANGE: `${BASE}/auth/change-password/confirm`,
   },
   BOOKS: {
     LIST: `${BASE}/books`,
