@@ -38,6 +38,21 @@ export async function notifyBookListed(
   });
 }
 
+export async function notifyWishlistAdd(
+  userId: string,
+  userName: string,
+  bookTitle: string
+) {
+  const message = `${userName} added "${bookTitle}" to their wishlist.`;
+
+  return createNotification({
+    type: "wishlist_add",
+    message,
+    user: userId,
+    changedFields: ["wishlist"],
+  });
+}
+
 export async function listNotifications(page?: string, limit?: string) {
   const currentPage = page && parseInt(page) > 0 ? parseInt(page) : 1;
   const currentLimit = limit && parseInt(limit) > 0 ? parseInt(limit) : 10;
