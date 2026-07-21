@@ -10,6 +10,8 @@ import adminUserRoutes from "./routes/admin/user.route";
 import adminNotificationRoutes from "./routes/admin/notification.route";
 import adminBookRoutes from "./routes/admin/book.route";
 import bookRoutes from "./routes/book.route";
+import wishlistRoutes from "./routes/wishlist.route";
+import purchaseRoutes from "./routes/purchase.route";
 
 dotenv.config();
 
@@ -32,6 +34,8 @@ app.use("/api/v1/admin/users", adminUserRoutes);
 app.use("/api/v1/admin/notifications", adminNotificationRoutes);
 app.use("/api/v1/admin/books", adminBookRoutes);
 app.use("/api/v1/books", bookRoutes);
+app.use("/api/v1/wishlist", wishlistRoutes);
+app.use("/api/v1/purchases", purchaseRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "KitabGhar API is running" });
