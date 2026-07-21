@@ -12,9 +12,19 @@ export const ENDPOINTS = {
     LIST: `${BASE}/books`,
     CREATE: `${BASE}/books`,
     MINE: `${BASE}/books/mine`,
+    FEATURED: `${BASE}/books/featured`,
     DETAIL: (id: string) => `${BASE}/books/${id}`,
     UPDATE: (id: string) => `${BASE}/books/${id}`,
     DELETE: (id: string) => `${BASE}/books/${id}`,
+  },
+  WISHLIST: {
+    LIST: `${BASE}/wishlist`,
+    TOGGLE: `${BASE}/wishlist/toggle`,
+    DELETE: (bookId: string) => `${BASE}/wishlist/${bookId}`,
+  },
+  PURCHASES: {
+    LIST: `${BASE}/purchases`,
+    CREATE: `${BASE}/purchases`,
   },
   ADMIN: {
     USERS: {
