@@ -9,6 +9,7 @@ export interface IBook extends Document {
   image: string;
   seller: mongoose.Types.ObjectId;
   status: "Active" | "Sold";
+  source: "admin" | "user";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -23,6 +24,7 @@ const BookSchema = new Schema<IBook>(
     image: { type: String, required: true },
     seller: { type: Schema.Types.ObjectId, ref: "User", required: true },
     status: { type: String, enum: ["Active", "Sold"], default: "Active" },
+    source: { type: String, enum: ["admin", "user"], default: "user" },
   },
   { timestamps: true }
 );
