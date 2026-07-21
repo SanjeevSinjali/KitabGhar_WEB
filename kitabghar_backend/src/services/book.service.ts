@@ -1,6 +1,7 @@
 import {
   createBook,
   findBooksBySeller,
+  findFeaturedBooksPaginated,
   findAllBooksPaginated,
   findBookByIdPopulated,
   deleteBookById,
@@ -11,14 +12,30 @@ import type { PaginationMeta } from "../utils/apiResponse";
 
 export async function createBookService(
   sellerId: string,
+  sellerRole: string,
   data: CreateBookDTO,
   image: string
 ): Promise<IBook> {
-  return createBook({ ...data, image, seller: sellerId });
+  return createBook({
+    ...data,
+    image,
+    seller: sellerId,
+    source: sellerRole === "admin" ? "admin" : "user",
+  });
 }
 
 export async function listMyBooks(sellerId: string): Promise<IBook[]> {
   return findBooksBySeller(sellerId);
+}
+
+export async function listFeaturedBooks(page?: string, limit?: string) {
+  const currentPage = page && parseInt(page) > 0 ? parseInt(page) : 1;
+  const currentLimit = limit && parseInt(limit) > 0 ? parseInt(limit) : 6;
+
+  const { data, total } = await findFeaturedBooksPaginated(currentPage, currentLimit);
+  const totalPages = Math.ceil(total / currentLimit);
+
+  return { data, meta: { page: currentPage, limit: currentLimit, total, totalPages } };
 }
 
 export async function adminListBooks(
