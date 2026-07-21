@@ -16,6 +16,12 @@ export async function findBookById(bookId: string) {
   return Book.findById(bookId);
 }
 
-export async function markBookSold(bookId: string) {
-  return Book.findByIdAndUpdate(bookId, { status: "Sold" });
+// Atomic: only succeeds if the book is still "Active" at the moment of update.
+// Prevents two buyers from both succeeding on the same book.
+export async function markBookSoldIfActive(bookId: string) {
+  return Book.findOneAndUpdate(
+    { _id: bookId, status: "Active" },
+    { status: "Sold" },
+    { new: true }
+  );
 }

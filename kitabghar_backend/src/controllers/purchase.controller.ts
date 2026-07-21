@@ -10,7 +10,7 @@ export async function purchaseBook(req: Request, res: Response) {
       return sendError(res, "bookId and title are required", 400);
     }
 
-    const purchase = await buyBook((req as any).user.id, {
+    const purchase = await buyBook((req as any).user.id, (req as any).user.name, {
       bookId,
       title,
       author,
