@@ -7,11 +7,20 @@ export const sellBookSchema = z.object({
   condition: z.enum(["Like New", "Good", "Fair"]),
   description: z.string().max(500, "Description is too long").optional(),
   image: z
-    .instanceof(FileList)
-    .refine((files) => files.length === 1, "Book photo is required")
-    .refine((files) => files[0]?.size <= 4 * 1024 * 1024, "Image must be smaller than 4MB")
+    .any()
     .refine(
-      (files) => ["image/jpeg", "image/png", "image/webp"].includes(files[0]?.type),
+      (files) => typeof FileList !== "undefined" && files instanceof FileList && files.length === 1,
+      "Book photo is required"
+    )
+    .refine(
+      (files) => (files as FileList)?.[0]?.size <= 4 * 1024 * 1024,
+      "Image must be smaller than 4MB"
+    )
+    .refine(
+      (files) =>
+        ["image/jpeg", "image/png", "image/webp"].includes(
+          (files as FileList)?.[0]?.type ?? ""
+        ),
       "Only jpg, png, or webp images are allowed"
     ),
 });
