@@ -72,6 +72,7 @@ export async function whoamiAction() {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
+    cache: "no-store",
   });
   if (!res.ok) return null;
   const data = await res.json() as {
