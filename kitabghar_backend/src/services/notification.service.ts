@@ -3,6 +3,9 @@ import {
   getNotificationsPaginated,
   markNotificationRead,
   markAllNotificationsRead,
+  getUserNotificationsPaginated,
+  markUserNotificationRead,
+  markAllUserNotificationsRead,
 } from "../repositories/notification.repository";
 
 export async function notifyProfileUpdate(
@@ -53,6 +56,23 @@ export async function notifyWishlistAdd(
   });
 }
 
+export async function notifyBookSold(
+  sellerId: string,
+  buyerName: string,
+  bookTitle: string,
+  price: string
+) {
+  const message = `${buyerName} bought your book "${bookTitle}" for ${price}.`;
+
+  return createNotification({
+    type: "book_sold",
+    message,
+    user: sellerId,
+    recipient: sellerId,
+    changedFields: ["book_sold"],
+  });
+}
+
 export async function listNotifications(page?: string, limit?: string) {
   const currentPage = page && parseInt(page) > 0 ? parseInt(page) : 1;
   const currentLimit = limit && parseInt(limit) > 0 ? parseInt(limit) : 10;
@@ -75,4 +95,29 @@ export async function readNotification(id: string) {
 
 export async function readAllNotifications() {
   await markAllNotificationsRead();
+}
+
+// User-facing (recipient-scoped)
+export async function listMyNotifications(userId: string, page?: string, limit?: string) {
+  const currentPage = page && parseInt(page) > 0 ? parseInt(page) : 1;
+  const currentLimit = limit && parseInt(limit) > 0 ? parseInt(limit) : 10;
+
+  const { data, total, unread } = await getUserNotificationsPaginated(userId, currentPage, currentLimit);
+  const totalPages = Math.ceil(total / currentLimit);
+
+  return {
+    data,
+    unread,
+    meta: { page: currentPage, limit: currentLimit, total, totalPages },
+  };
+}
+
+export async function readMyNotification(userId: string, id: string) {
+  const notification = await markUserNotificationRead(userId, id);
+  if (!notification) throw Object.assign(new Error("Notification not found"), { status: 404 });
+  return notification;
+}
+
+export async function readAllMyNotifications(userId: string) {
+  await markAllUserNotificationsRead(userId);
 }
