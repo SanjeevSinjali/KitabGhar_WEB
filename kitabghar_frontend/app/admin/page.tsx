@@ -30,13 +30,20 @@ export default async function AdminPage() {
           </p>
         </Link>
 
-        <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-6 opacity-50">
+        <Link
+          href="/admin/books/create"
+          className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md"
+        >
           <div className="mb-3 inline-flex rounded-xl bg-green-50 p-3 text-green-600">
             <BookOpen size={24} />
           </div>
-          <h3 className="font-semibold text-slate-900">Book Management</h3>
-          <p className="mt-1 text-sm text-slate-500">Coming soon</p>
-        </div>
+          <h3 className="font-semibold text-slate-900 group-hover:text-[#1E3A5F]">
+            Book Management
+          </h3>
+          <p className="mt-1 text-sm text-slate-500">
+            Upload new books shown in Browse Books
+          </p>
+        </Link>
 
         <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-6 opacity-50">
           <div className="mb-3 inline-flex rounded-xl bg-purple-50 p-3 text-purple-600">
