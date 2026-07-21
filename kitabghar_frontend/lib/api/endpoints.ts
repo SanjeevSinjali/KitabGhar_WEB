@@ -26,6 +26,11 @@ export const ENDPOINTS = {
     LIST: `${BASE}/purchases`,
     CREATE: `${BASE}/purchases`,
   },
+  NOTIFICATIONS: {
+    LIST: `${BASE}/notifications`,
+    MARK_READ: (id: string) => `${BASE}/notifications/${id}/read`,
+    MARK_ALL_READ: `${BASE}/notifications/read-all`,
+  },
   ADMIN: {
     USERS: {
       LIST: `${BASE}/admin/users`,

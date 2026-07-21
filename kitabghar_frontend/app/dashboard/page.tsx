@@ -10,6 +10,7 @@ import { BookOpen, ShoppingBag, Star, Package, Heart, Search } from "lucide-reac
 import LogoutButton from "@/app/_components/logoutbutton";
 import SellBookModal from "@/app/dashboard/_components/SellBookModal";
 import BrowseBooksSlider from "@/app/dashboard/_components/BrowseBooksSlider";
+import NotificationBell from "@/app/dashboard/_components/NotificationBell";
 
 type MyBook = {
   _id: string;
@@ -108,6 +109,7 @@ export default async function DashboardPage() {
             <input type="text" placeholder="Search books..." className="bg-transparent text-sm outline-none placeholder:text-slate-400 w-full" />
           </div>
           <div className="flex items-center gap-3">
+            <NotificationBell />
             <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2">
               {user.avatar ? (
                 <div className="relative h-8 w-8 overflow-hidden rounded-full">
