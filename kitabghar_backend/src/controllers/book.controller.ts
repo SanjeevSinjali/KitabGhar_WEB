@@ -1,7 +1,7 @@
 import type { Response } from "express";
 import type { Request } from "express-serve-static-core";
 import { CreateBookSchema } from "../types/book.type";
-import { createBookService, listMyBooks } from "../services/book.service";
+import { createBookService, listMyBooks, listFeaturedBooks } from "../services/book.service";
 import { notifyBookListed } from "../services/notification.service";
 import { sendSuccess, sendError } from "../utils/apiResponse";
 
@@ -18,14 +18,21 @@ export async function createBook(req: Request & { file?: any }, res: Response) {
     }
 
     const image = `/books/${req.file.filename}`;
-    const book = await createBookService((req as any).user.id, parsed.data, image);
-
-    await notifyBookListed(
+    const book = await createBookService(
       (req as any).user.id,
-      (req as any).user.name,
-      book.title,
-      book.price
+      (req as any).user.role,
+      parsed.data,
+      image
     );
+
+    if ((req as any).user.role !== "admin") {
+      await notifyBookListed(
+        (req as any).user.id,
+        (req as any).user.name,
+        book.title,
+        book.price
+      );
+    }
 
     return sendSuccess(res, book, "Book listed successfully", 201);
   } catch (error: any) {
@@ -37,6 +44,16 @@ export async function getMyBooks(req: Request, res: Response) {
   try {
     const books = await listMyBooks((req as any).user.id);
     return sendSuccess(res, books, "Books retrieved successfully");
+  } catch (error: any) {
+    return sendError(res, error.message || "Internal server error", error.status || 500);
+  }
+}
+
+export async function getFeaturedBooks(req: Request, res: Response) {
+  try {
+    const { page, limit } = req.query as { page?: string; limit?: string };
+    const { data, meta } = await listFeaturedBooks(page, limit);
+    return sendSuccess(res, data, "Featured books retrieved successfully", 200, meta);
   } catch (error: any) {
     return sendError(res, error.message || "Internal server error", error.status || 500);
   }
