@@ -8,6 +8,7 @@ export async function createBook(data: {
   description?: string;
   image: string;
   seller: string;
+  source: "admin" | "user";
 }): Promise<IBook> {
   const book = new Book(data);
   return book.save();
@@ -15,6 +16,21 @@ export async function createBook(data: {
 
 export async function findBooksBySeller(sellerId: string): Promise<IBook[]> {
   return Book.find({ seller: sellerId }).sort({ createdAt: -1 });
+}
+
+export async function findFeaturedBooksPaginated(
+  page: number,
+  limit: number
+): Promise<{ data: IBook[]; total: number }> {
+  const query: Record<string, unknown> = { source: "admin" };
+
+  const total = await Book.countDocuments(query);
+  const data = await Book.find(query)
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  return { data, total };
 }
 
 export async function findAllBooksPaginated(
