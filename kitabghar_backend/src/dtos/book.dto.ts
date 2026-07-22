@@ -3,5 +3,6 @@ export interface CreateBookDTO {
   author: string;
   price: number;
   condition: "Like New" | "Good" | "Fair";
+  category: string;
   description?: string;
 }
