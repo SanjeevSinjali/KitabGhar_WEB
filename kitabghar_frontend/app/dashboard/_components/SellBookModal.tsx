@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { X, PlusCircle, Loader2, ImagePlus } from "lucide-react";
 import { sellBookSchema, type SellBookFormInput, type SellBookFormData } from "./schema";
 import { handleCreateBook } from "@/lib/actions/book-action";
+import { BOOK_CATEGORIES } from "@/lib/constants";
 
 const inputClass =
   "h-11 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-[#1E3A5F] focus:ring-1 focus:ring-[#1E3A5F]";
@@ -30,7 +31,7 @@ export default function SellBookModal() {
     formState: { errors },
   } = useForm<SellBookFormInput, unknown, SellBookFormData>({
     resolver: zodResolver(sellBookSchema),
-    defaultValues: { condition: "Good" },
+    defaultValues: { condition: "Good", category: "Other" },
   });
 
   function close() {
@@ -55,6 +56,7 @@ export default function SellBookModal() {
       fd.append("author", data.author);
       fd.append("price", String(data.price));
       fd.append("condition", data.condition);
+      fd.append("category", data.category);
       if (data.description) fd.append("description", data.description);
       fd.append("image", data.image[0]);
 
@@ -139,13 +141,13 @@ export default function SellBookModal() {
 
               <div>
                 <label className={labelClass}>Title</label>
-                <input {...register("title")} type="text" placeholder="e.g. Clean Code" className={inputClass} />
+                <input {...register("title")} type="text" placeholder=" " className={inputClass} />
                 {errors.title && <span className={errClass}>{errors.title.message}</span>}
               </div>
 
               <div>
                 <label className={labelClass}>Author</label>
-                <input {...register("author")} type="text" placeholder="e.g. Robert C. Martin" className={inputClass} />
+                <input {...register("author")} type="text" placeholder=" " className={inputClass} />
                 {errors.author && <span className={errClass}>{errors.author.message}</span>}
               </div>
 
@@ -156,7 +158,7 @@ export default function SellBookModal() {
                     {...register("price")}
                     type="number"
                     step="0.01"
-                    placeholder="1050"
+                    placeholder=" "
                     className={`${inputClass} ${noSpinnerClass}`}
                   />
                   {errors.price && <span className={errClass}>{errors.price.message}</span>}
@@ -173,11 +175,23 @@ export default function SellBookModal() {
               </div>
 
               <div>
+                <label className={labelClass}>Genre</label>
+                <select {...register("category")} className={inputClass}>
+                  {BOOK_CATEGORIES.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+                {errors.category && <span className={errClass}>{errors.category.message}</span>}
+              </div>
+
+              <div>
                 <label className={labelClass}>Description (optional)</label>
                 <textarea
                   {...register("description")}
                   rows={3}
-                  placeholder="Condition details, edition, any notes for buyers..."
+                  placeholder=" "
                   className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-[#1E3A5F] focus:ring-1 focus:ring-[#1E3A5F]"
                 />
                 {errors.description && <span className={errClass}>{errors.description.message}</span>}
