@@ -2,6 +2,7 @@ import {
   createBook,
   findBooksBySeller,
   findFeaturedBooksPaginated,
+  searchBooks,
   findAllBooksPaginated,
   findBookByIdPopulated,
   deleteBookById,
@@ -29,14 +30,19 @@ export async function listMyBooks(sellerId: string): Promise<IBook[]> {
   return findBooksBySeller(sellerId);
 }
 
-export async function listFeaturedBooks(page?: string, limit?: string) {
+export async function listFeaturedBooks(page?: string, limit?: string, category?: string) {
   const currentPage = page && parseInt(page) > 0 ? parseInt(page) : 1;
   const currentLimit = limit && parseInt(limit) > 0 ? parseInt(limit) : 6;
 
-  const { data, total } = await findFeaturedBooksPaginated(currentPage, currentLimit);
+  const { data, total } = await findFeaturedBooksPaginated(currentPage, currentLimit, category);
   const totalPages = Math.ceil(total / currentLimit);
 
   return { data, meta: { page: currentPage, limit: currentLimit, total, totalPages } };
+}
+
+export async function searchBooksService(q: string): Promise<IBook[]> {
+  if (!q || q.trim().length < 1) return [];
+  return searchBooks(q.trim(), 8);
 }
 
 export async function adminListBooks(
