@@ -1,6 +1,14 @@
 "use server";
 
-import { createBookApi, fetchMyBooksApi, fetchFeaturedBooksApi, searchBooksApi } from "@/lib/api/books";
+import { revalidatePath } from "next/cache";
+import {
+  createBookApi,
+  fetchMyBooksApi,
+  updateBookApi,
+  deleteMyBookApi,
+  fetchFeaturedBooksApi,
+  searchBooksApi,
+} from "@/lib/api/books";
 
 export async function handleCreateBook(formData: FormData) {
   try {
@@ -24,6 +32,36 @@ export async function handleGetMyBooks() {
     return { success: false, message: result.message || "Failed to fetch your books" };
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : "Failed to fetch your books";
+    return { success: false, message: msg };
+  }
+}
+
+export async function handleUpdateBook(id: string, formData: FormData) {
+  try {
+    const result = await updateBookApi(id, formData);
+    if (result.success) {
+      revalidatePath("/dashboard");
+      revalidatePath("/browse");
+      return { success: true, message: result.message, data: result.data };
+    }
+    return { success: false, message: result.message || "Failed to update book" };
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : "Failed to update book";
+    return { success: false, message: msg };
+  }
+}
+
+export async function handleDeleteMyBook(id: string) {
+  try {
+    const result = await deleteMyBookApi(id);
+    if (result.success) {
+      revalidatePath("/dashboard");
+      revalidatePath("/browse");
+      return { success: true, message: result.message };
+    }
+    return { success: false, message: result.message || "Failed to delete book" };
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : "Failed to delete book";
     return { success: false, message: msg };
   }
 }

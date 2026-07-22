@@ -30,6 +30,33 @@ export async function fetchMyBooksApi() {
   return res.json();
 }
 
+export async function updateBookApi(id: string, data: FormData) {
+  const token = await getTokenCookie();
+  const res = await fetch(`${API_BASE}${ENDPOINTS.BOOKS.UPDATE(id)}`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}` },
+    body: data,
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || "Failed to update book");
+  }
+  return res.json();
+}
+
+export async function deleteMyBookApi(id: string) {
+  const token = await getTokenCookie();
+  const res = await fetch(`${API_BASE}${ENDPOINTS.BOOKS.DELETE(id)}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || "Failed to delete book");
+  }
+  return res.json();
+}
+
 export async function fetchFeaturedBooksApi(
   params: { page?: number; limit?: number; category?: string } = {}
 ) {

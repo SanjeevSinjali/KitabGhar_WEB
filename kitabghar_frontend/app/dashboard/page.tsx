@@ -13,6 +13,8 @@ import BrowseBooksSlider from "@/app/dashboard/_components/BrowseBooksSlider";
 import NotificationBell from "@/app/dashboard/_components/NotificationBell";
 import SearchBar from "@/app/dashboard/_components/SearchBar";
 import CategoryFilter from "@/app/dashboard/_components/CategoryFilter";
+import EditBookModal from "@/app/dashboard/_components/EditBookModal";
+import DeleteListingButton from "@/app/dashboard/_components/DeleteListingButton";
 
 type MyBook = {
   _id: string;
@@ -20,6 +22,8 @@ type MyBook = {
   author: string;
   price: number;
   condition: "Like New" | "Good" | "Fair";
+  category?: string;
+  description?: string;
   image: string;
   status: "Active" | "Sold";
   createdAt: string;
@@ -137,7 +141,7 @@ export default async function DashboardPage({
 
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900">Welcome back, {user.name} </h1>
+          <h1 className="text-2xl font-bold text-slate-900">Welcome back, {user.name}</h1>
           <p className="mt-1 text-sm text-slate-500">Discover books, manage your listings, and track your activity.</p>
         </div>
 
@@ -219,7 +223,8 @@ export default async function DashboardPage({
                     <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${book.status === "Active" ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-500"}`}>
                       {book.status}
                     </span>
-                    <button className="shrink-0 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50">Edit</button>
+                    <EditBookModal book={book} />
+                    <DeleteListingButton bookId={book._id} title={book.title} />
                   </div>
                 ))
               )}
