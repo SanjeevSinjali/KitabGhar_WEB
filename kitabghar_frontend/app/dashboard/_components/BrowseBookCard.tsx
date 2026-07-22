@@ -13,6 +13,7 @@ export type FeaturedBook = {
   author: string;
   price: number;
   condition: string;
+  category?: string;
   image: string;
   status?: "Active" | "Sold";
 };
@@ -117,6 +118,11 @@ export default function BrowseBookCard({
         <div className="p-3">
           <p className="truncate text-sm font-medium text-slate-900">{book.title}</p>
           <p className="truncate text-xs text-slate-500">{book.author}</p>
+          {book.category && (
+            <span className="mt-1.5 inline-block rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-500">
+              {book.category}
+            </span>
+          )}
           <div className="mt-2 flex items-center justify-between">
             <span className="text-sm font-semibold text-[#1E3A5F]">Rs. {book.price}</span>
             <span className={`text-xs rounded-full px-2 py-0.5 ${conditionColors[book.condition] ?? ""}`}>
