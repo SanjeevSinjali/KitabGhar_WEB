@@ -19,6 +19,22 @@ export async function findBooksBySeller(sellerId: string): Promise<IBook[]> {
   return Book.find({ seller: sellerId }).sort({ createdAt: -1 });
 }
 
+export async function findBookOwnedBySeller(id: string, sellerId: string): Promise<IBook | null> {
+  return Book.findOne({ _id: id, seller: sellerId });
+}
+
+export async function updateBookOwnedBySeller(
+  id: string,
+  sellerId: string,
+  fields: Record<string, unknown>
+): Promise<IBook | null> {
+  return Book.findOneAndUpdate({ _id: id, seller: sellerId }, fields, { new: true, runValidators: true });
+}
+
+export async function deleteBookOwnedBySeller(id: string, sellerId: string): Promise<IBook | null> {
+  return Book.findOneAndDelete({ _id: id, seller: sellerId });
+}
+
 export async function findFeaturedBooksPaginated(
   page: number,
   limit: number,
