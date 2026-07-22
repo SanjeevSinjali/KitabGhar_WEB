@@ -1,5 +1,5 @@
 import { handleGetAllBooks } from "@/lib/actions/admin/book-action";
-import BookTable from "../_components/BookTable";
+import BookTable from "./_components/BookTable";
 
 export default async function BooksPage({
   searchParams,

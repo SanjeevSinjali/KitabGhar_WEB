@@ -40,15 +40,18 @@ export const ENDPOINTS = {
       UPDATE: (id: string) => `${BASE}/admin/users/${id}`,
       DELETE: (id: string) => `${BASE}/admin/users/${id}`,
     },
+    
     NOTIFICATIONS: {
       LIST: `${BASE}/admin/notifications`,
       MARK_READ: (id: string) => `${BASE}/admin/notifications/${id}/read`,
       MARK_ALL_READ: `${BASE}/admin/notifications/read-all`,
     },
+
     BOOKS: {
       LIST: `${BASE}/admin/books`,
       GET: (id: string) => `${BASE}/admin/books/${id}`,
       DELETE: (id: string) => `${BASE}/admin/books/${id}`,
+      UPDATE_STATUS: (id: string) => `${BASE}/admin/books/${id}/status`,
     },
   },
 };

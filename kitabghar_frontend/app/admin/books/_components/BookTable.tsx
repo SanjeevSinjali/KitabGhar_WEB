@@ -3,9 +3,9 @@ import { useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, Plus, Trash2, ChevronLeft, ChevronRight, Loader2, BookOpen } from "lucide-react";
+import { Search, Plus, Trash2, RotateCcw, CheckCircle2, ChevronLeft, ChevronRight, Loader2, BookOpen } from "lucide-react";
 import Modal from "../../_components/Modal";
-import { handleDeleteBook } from "@/lib/actions/admin/book-action";
+import { handleDeleteBook, handleUpdateBookStatus } from "@/lib/actions/admin/book-action";
 
 interface Seller {
   _id: string;
@@ -51,6 +51,7 @@ export default function BookTable({
   const router = useRouter();
   const params = useSearchParams();
   const [isPending, startTransition] = useTransition();
+  const [statusPendingId, setStatusPendingId] = useState<string | null>(null);
   const [target, setTarget] = useState<Book | null>(null);
   const [deleteError, setDeleteError] = useState("");
 
@@ -82,6 +83,16 @@ export default function BookTable({
       } else {
         setDeleteError(result.message || "Failed to delete book");
       }
+    });
+  };
+
+  const onToggleStatus = (book: Book) => {
+    const nextStatus = book.status === "Sold" ? "Active" : "Sold";
+    setStatusPendingId(book._id);
+    startTransition(async () => {
+      await handleUpdateBookStatus(book._id, nextStatus);
+      setStatusPendingId(null);
+      router.refresh();
     });
   };
 
@@ -188,6 +199,24 @@ export default function BookTable({
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-1">
+                      <button
+                        onClick={() => onToggleStatus(book)}
+                        disabled={isPending && statusPendingId === book._id}
+                        title={book.status === "Sold" ? "Mark as Available" : "Mark as Sold"}
+                        className={`rounded-lg p-2 transition disabled:opacity-50 ${
+                          book.status === "Sold"
+                            ? "text-slate-400 hover:bg-green-50 hover:text-green-600"
+                            : "text-slate-400 hover:bg-amber-50 hover:text-amber-600"
+                        }`}
+                      >
+                        {isPending && statusPendingId === book._id ? (
+                          <Loader2 size={16} className="animate-spin" />
+                        ) : book.status === "Sold" ? (
+                          <RotateCcw size={16} />
+                        ) : (
+                          <CheckCircle2 size={16} />
+                        )}
+                      </button>
                       <button
                         onClick={() => setTarget(book)}
                         className="rounded-lg p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-500"

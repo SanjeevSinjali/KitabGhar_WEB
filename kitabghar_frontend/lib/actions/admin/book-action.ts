@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { fetchBooks, fetchBookById, deleteBookApi } from "@/lib/api/admin/book";
+import { fetchBooks, fetchBookById, deleteBookApi, updateBookStatusApi } from "@/lib/api/admin/book";
 
 export async function handleGetAllBooks({
   page,
@@ -51,6 +51,20 @@ export async function handleDeleteBook(id: string) {
     return { success: false, message: result.message || "Failed to delete book" };
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : "Failed to delete book";
+    return { success: false, message: msg };
+  }
+}
+
+export async function handleUpdateBookStatus(id: string, status: "Active" | "Sold") {
+  try {
+    const result = await updateBookStatusApi(id, status);
+    if (result.success) {
+      revalidatePath("/admin/books");
+      return { success: true, message: result.message };
+    }
+    return { success: false, message: result.message || "Failed to update status" };
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : "Failed to update status";
     return { success: false, message: msg };
   }
 }

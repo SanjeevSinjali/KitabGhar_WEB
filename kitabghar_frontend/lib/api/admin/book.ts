@@ -58,3 +58,17 @@ export async function deleteBookApi(id: string) {
   }
   return res.json();
 }
+
+export async function updateBookStatusApi(id: string, status: "Active" | "Sold") {
+  const headers = await authHeaders();
+  const res = await fetch(`${API_BASE}${ENDPOINTS.ADMIN.BOOKS.UPDATE_STATUS(id)}`, {
+    method: "PATCH",
+    headers,
+    body: JSON.stringify({ status }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || "Failed to update book status");
+  }
+  return res.json();
+}
