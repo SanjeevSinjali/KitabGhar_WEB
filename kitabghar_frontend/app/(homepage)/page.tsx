@@ -83,9 +83,12 @@ export default function HomePage() {
               <div className="p-5">
                 <h4 className="text-lg font-semibold">{book.title}</h4>
                 <p className="mt-1 text-sm text-slate-600">{book.subtitle}</p>
-                <button className="mt-5 w-full rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-slate-800">
+                <Link
+                  href="/login"
+                  className="mt-5 block w-full rounded-xl bg-slate-900 px-4 py-3 text-center text-sm font-medium text-white transition hover:bg-slate-800"
+                >
                   Buy Now
-                </button>
+                </Link>
               </div>
             </div>
           ))}
