@@ -5,6 +5,7 @@ export interface IBook extends Document {
   author: string;
   price: number;
   condition: "Like New" | "Good" | "Fair";
+  category: string;
   description?: string;
   image: string;
   seller: mongoose.Types.ObjectId;
@@ -20,6 +21,11 @@ const BookSchema = new Schema<IBook>(
     author: { type: String, required: true, trim: true },
     price: { type: Number, required: true, min: 0 },
     condition: { type: String, enum: ["Like New", "Good", "Fair"], default: "Good" },
+    category: {
+      type: String,
+      enum: ["Fiction", "Non-Fiction", "Academic", "Self-Help", "Biography", "Children's", "Comics", "Other"],
+      default: "Other",
+    },
     description: { type: String, trim: true, default: "" },
     image: { type: String, required: true },
     seller: { type: Schema.Types.ObjectId, ref: "User", required: true },
