@@ -1,10 +1,12 @@
 import { z } from "zod";
+import { BOOK_CATEGORIES } from "@/lib/constants";
 
 export const sellBookSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
   author: z.string().min(2, "Author must be at least 2 characters"),
   price: z.coerce.number().positive("Price must be greater than 0"),
   condition: z.enum(["Like New", "Good", "Fair"]),
+  category: z.enum(BOOK_CATEGORIES),
   description: z.string().max(500, "Description is too long").optional(),
   image: z
     .any()
