@@ -5,6 +5,7 @@ export async function createBook(data: {
   author: string;
   price: number;
   condition: string;
+  category: string;
   description?: string;
   image: string;
   seller: string;
@@ -20,9 +21,11 @@ export async function findBooksBySeller(sellerId: string): Promise<IBook[]> {
 
 export async function findFeaturedBooksPaginated(
   page: number,
-  limit: number
+  limit: number,
+  category?: string
 ): Promise<{ data: IBook[]; total: number }> {
   const query: Record<string, unknown> = { source: "admin" };
+  if (category) query.category = category;
 
   const total = await Book.countDocuments(query);
   const data = await Book.find(query)
@@ -31,6 +34,18 @@ export async function findFeaturedBooksPaginated(
     .limit(limit);
 
   return { data, total };
+}
+
+export async function searchBooks(q: string, limit: number): Promise<IBook[]> {
+  const query: Record<string, unknown> = {
+    source: "admin",
+    $or: [
+      { title: { $regex: q, $options: "i" } },
+      { author: { $regex: q, $options: "i" } },
+    ],
+  };
+
+  return Book.find(query).sort({ createdAt: -1 }).limit(limit);
 }
 
 export async function findAllBooksPaginated(
