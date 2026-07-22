@@ -64,3 +64,10 @@ export async function findBookByIdPopulated(id: string): Promise<IBook | null> {
 export async function deleteBookById(id: string): Promise<IBook | null> {
   return Book.findByIdAndDelete(id);
 }
+
+export async function updateBookStatus(
+  id: string,
+  status: "Active" | "Sold"
+): Promise<IBook | null> {
+  return Book.findByIdAndUpdate(id, { status }, { new: true });
+}

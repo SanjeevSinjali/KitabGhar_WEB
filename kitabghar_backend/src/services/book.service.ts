@@ -5,6 +5,7 @@ import {
   findAllBooksPaginated,
   findBookByIdPopulated,
   deleteBookById,
+  updateBookStatus,
 } from "../repositories/book.repository";
 import type { CreateBookDTO } from "../dtos/book.dto";
 import type { IBook } from "../models/book.model";
@@ -65,4 +66,13 @@ export async function adminGetBookById(id: string): Promise<IBook> {
 export async function adminDeleteBook(id: string): Promise<void> {
   const book = await deleteBookById(id);
   if (!book) throw Object.assign(new Error("Book not found"), { status: 404 });
+}
+
+export async function adminUpdateBookStatus(
+  id: string,
+  status: "Active" | "Sold"
+): Promise<IBook> {
+  const book = await updateBookStatus(id, status);
+  if (!book) throw Object.assign(new Error("Book not found"), { status: 404 });
+  return book;
 }
