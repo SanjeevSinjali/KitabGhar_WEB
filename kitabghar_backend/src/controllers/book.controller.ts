@@ -1,7 +1,14 @@
 import type { Response } from "express";
 import type { Request } from "express-serve-static-core";
 import { CreateBookSchema } from "../types/book.type";
-import { createBookService, listMyBooks, listFeaturedBooks, searchBooksService } from "../services/book.service";
+import {
+  createBookService,
+  listMyBooks,
+  updateMyBook,
+  deleteMyBook,
+  listFeaturedBooks,
+  searchBooksService,
+} from "../services/book.service";
 import { notifyBookListed } from "../services/notification.service";
 import { sendSuccess, sendError } from "../utils/apiResponse";
 
@@ -44,6 +51,31 @@ export async function getMyBooks(req: Request, res: Response) {
   try {
     const books = await listMyBooks((req as any).user.id);
     return sendSuccess(res, books, "Books retrieved successfully");
+  } catch (error: any) {
+    return sendError(res, error.message || "Internal server error", error.status || 500);
+  }
+}
+
+export async function updateMyBookHandler(req: Request<{ id: string }> & { file?: any }, res: Response) {
+  try {
+    const parsed = CreateBookSchema.partial().safeParse(req.body);
+    if (!parsed.success) {
+      const msg = parsed.error.issues[0]?.message || "Validation failed";
+      return sendError(res, msg, 400);
+    }
+
+    const image = req.file ? `/books/${req.file.filename}` : undefined;
+    const book = await updateMyBook(req.params.id, (req as any).user.id, parsed.data, image);
+    return sendSuccess(res, book, "Book updated successfully");
+  } catch (error: any) {
+    return sendError(res, error.message || "Internal server error", error.status || 500);
+  }
+}
+
+export async function deleteMyBookHandler(req: Request<{ id: string }>, res: Response) {
+  try {
+    await deleteMyBook(req.params.id, (req as any).user.id);
+    return sendSuccess(res, null, "Book deleted successfully");
   } catch (error: any) {
     return sendError(res, error.message || "Internal server error", error.status || 500);
   }
