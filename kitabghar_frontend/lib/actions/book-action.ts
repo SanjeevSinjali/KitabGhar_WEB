@@ -1,6 +1,6 @@
 "use server";
 
-import { createBookApi, fetchMyBooksApi, fetchFeaturedBooksApi } from "@/lib/api/books";
+import { createBookApi, fetchMyBooksApi, fetchFeaturedBooksApi, searchBooksApi } from "@/lib/api/books";
 
 export async function handleCreateBook(formData: FormData) {
   try {
@@ -29,16 +29,29 @@ export async function handleGetMyBooks() {
 }
 
 export async function handleGetFeaturedBooks(
-  { page, limit }: { page?: number; limit?: number } = {}
+  { page, limit, category }: { page?: number; limit?: number; category?: string } = {}
 ) {
   try {
-    const result = await fetchFeaturedBooksApi({ page, limit });
+    const result = await fetchFeaturedBooksApi({ page, limit, category });
     if (result.success) {
       return { success: true, data: result.data, pagination: result.meta };
     }
     return { success: false, message: result.message || "Failed to fetch books" };
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : "Failed to fetch books";
+    return { success: false, message: msg };
+  }
+}
+
+export async function handleSearchBooks(q: string) {
+  try {
+    const result = await searchBooksApi(q);
+    if (result.success) {
+      return { success: true, data: result.data };
+    }
+    return { success: false, message: result.message || "Search failed" };
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : "Search failed";
     return { success: false, message: msg };
   }
 }
