@@ -1,7 +1,7 @@
 import type { Response } from "express";
 import type { Request } from "express-serve-static-core";
 import { CreateBookSchema } from "../types/book.type";
-import { createBookService, listMyBooks, listFeaturedBooks } from "../services/book.service";
+import { createBookService, listMyBooks, listFeaturedBooks, searchBooksService } from "../services/book.service";
 import { notifyBookListed } from "../services/notification.service";
 import { sendSuccess, sendError } from "../utils/apiResponse";
 
@@ -51,9 +51,19 @@ export async function getMyBooks(req: Request, res: Response) {
 
 export async function getFeaturedBooks(req: Request, res: Response) {
   try {
-    const { page, limit } = req.query as { page?: string; limit?: string };
-    const { data, meta } = await listFeaturedBooks(page, limit);
+    const { page, limit, category } = req.query as { page?: string; limit?: string; category?: string };
+    const { data, meta } = await listFeaturedBooks(page, limit, category);
     return sendSuccess(res, data, "Featured books retrieved successfully", 200, meta);
+  } catch (error: any) {
+    return sendError(res, error.message || "Internal server error", error.status || 500);
+  }
+}
+
+export async function searchBooksHandler(req: Request, res: Response) {
+  try {
+    const q = (req.query.q as string) || "";
+    const books = await searchBooksService(q);
+    return sendSuccess(res, books, "Search results retrieved successfully");
   } catch (error: any) {
     return sendError(res, error.message || "Internal server error", error.status || 500);
   }
