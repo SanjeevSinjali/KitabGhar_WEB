@@ -1,6 +1,9 @@
 import {
   createBook,
   findBooksBySeller,
+  findBookOwnedBySeller,
+  updateBookOwnedBySeller,
+  deleteBookOwnedBySeller,
   findFeaturedBooksPaginated,
   searchBooks,
   findAllBooksPaginated,
@@ -28,6 +31,32 @@ export async function createBookService(
 
 export async function listMyBooks(sellerId: string): Promise<IBook[]> {
   return findBooksBySeller(sellerId);
+}
+
+export async function updateMyBook(
+  bookId: string,
+  sellerId: string,
+  data: Partial<CreateBookDTO>,
+  image?: string
+): Promise<IBook> {
+  const existing = await findBookOwnedBySeller(bookId, sellerId);
+  if (!existing) {
+    throw Object.assign(new Error("Book not found or you don't have permission to edit it"), { status: 404 });
+  }
+
+  const fields: Record<string, unknown> = { ...data };
+  if (image) fields.image = image;
+
+  const updated = await updateBookOwnedBySeller(bookId, sellerId, fields);
+  if (!updated) throw Object.assign(new Error("Failed to update book"), { status: 500 });
+  return updated;
+}
+
+export async function deleteMyBook(bookId: string, sellerId: string): Promise<void> {
+  const deleted = await deleteBookOwnedBySeller(bookId, sellerId);
+  if (!deleted) {
+    throw Object.assign(new Error("Book not found or you don't have permission to delete it"), { status: 404 });
+  }
 }
 
 export async function listFeaturedBooks(page?: string, limit?: string, category?: string) {
