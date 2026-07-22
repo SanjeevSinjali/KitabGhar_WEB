@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, ImagePlus } from "lucide-react";
 import { adminBookSchema, type AdminBookFormInput, type AdminBookFormData } from "./schema";
 import { handleCreateBook } from "@/lib/actions/book-action";
+import { BOOK_CATEGORIES } from "@/lib/constants";
 
 const inputClass =
   "h-11 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-[#1E3A5F] focus:ring-1 focus:ring-[#1E3A5F]";
@@ -28,7 +29,7 @@ export default function BookForm() {
     formState: { errors },
   } = useForm<AdminBookFormInput, unknown, AdminBookFormData>({
     resolver: zodResolver(adminBookSchema),
-    defaultValues: { condition: "Good" },
+    defaultValues: { condition: "Good", category: "Other" },
   });
 
   const imageField = register("image", {
@@ -47,6 +48,7 @@ export default function BookForm() {
     fd.append("author", data.author);
     fd.append("price", String(data.price));
     fd.append("condition", data.condition);
+    fd.append("category", data.category);
     if (data.description) fd.append("description", data.description);
     fd.append("image", data.image[0]);
 
@@ -136,6 +138,18 @@ export default function BookForm() {
             </select>
             {errors.condition && <span className={errClass}>{errors.condition.message}</span>}
           </div>
+        </div>
+
+        <div>
+          <label className={labelClass}>Category</label>
+          <select {...register("category")} className={inputClass}>
+            {BOOK_CATEGORIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+          {errors.category && <span className={errClass}>{errors.category.message}</span>}
         </div>
 
         <div>
