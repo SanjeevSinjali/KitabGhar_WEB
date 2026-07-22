@@ -1,0 +1,96 @@
+5652cb6 Sprint 2 - KitabGhar frontend and backend
+795f149 Added cookies
+5d94b7c Updated Packages
+eca623c Updated all the code for sprint-3
+eaa1d49 Added Admin User Management in Backend
+a6b5d7a Added Admin User Management Code for Frontend
+b67493c Avatar Added for User Credentials
+60aa354 mount admin notification routes
+99ff43a Added Notification Model
+7e70355 Added Notification Repository
+9ea32cc Added Notification Service
+56a3fa9 Added Admin Notification Controller
+699ad7f Added Admin Notification Routes
+8c7ca92 Notify Admin When User Updates Profile
+78d73da Added Admin Notifications for user profile updates
+462faf4 Image Added for Sell Book
+27597c7 add Book model
+5b26f20 add CreateBookDTO
+586c505 add book validation schema
+603363c add book repository
+49a70ad add book service
+4cb0fba add book controller(create + list mine)
+f6e0707 add book route
+4097e46 add multer config for book image uploads
+46afdb7 mount book routes and serve book images
+438e6cc notify admin when a book is listed
+8b4f33c trigger notification on book creation
+b21c5d6 add admin book routes
+3b00396 proxy book images for book
+1b16953 add admin book detail page with seller info
+8129cc6 add admin book table
+22688eb add admin book page
+5d72436 wire up My Listings and Recent Activity to real data
+679a8cb correct usrForm
+f54f710 add sell book form schema
+d0c4c36 add delete book Api
+ee2e83c add source field to distinguish admin vs user listings
+4ffc536 add fearured books support for admin listings
+92f5b97 add featured books support for admin listings
+f854276 add featured books support for admin listings
+188ba17 add featured books support for admin listings
+d4ba5ac fix mongo query typing and stale wishlist index
+826d2a2 add wishlist delete endpoint
+e370359 add wishlist delete endpoint
+46209c5 add wishlist delete endpoint
+4de791c add purchase flow
+e102878 add index flow
+d18dc30 sample image
+f84ee5d fixed some code
+05cd883 admin notification code
+f5f06e3 fixed image size
+ae5dde5 link admin Book Management to upload form
+87bf9bc add admin book upload page
+fb1eff9 connect Browse Books real dmin-uploaded books
+24e21bb add browse all book page
+a21a1c2 add wishlist page with remove option
+4cd864e add purchases page and dashboard integration
+aaef1c8 prevent double-purchase race condition
+63c8aaa add seller notifications
+3b02f80 add user notification bell for sale alerts
+b6f05ab prevent stale cached user data from showing across different accounts
+1d08ac9 feat: add email-verified password change, fix env/node_modules tracking
+82ba940 redesign profile page with 2-step password change
+ce76601 add password change form schema
+fa72f40 add view-all activity page
+00aa308 link Recent Activity to view-all page, remove duplicate purchases card
+f0ba5b3 add admin endpoint to toggle book sole/active status
+e8fad8b add mark unsold/sold toggle in admin books table
+6bf4549 add category field to Book model
+0999b17 add category to book validation schema
+d8ee929 add category to CreateBookDTO
+3b93f15 add category filtering and book search query
+0d85d1b add category filtering and search service
+41c7bbb add search endpoint and category query support
+5f2fa8e add book search route
+306df3a add permanent 30-book catalog seed script
+90353ec add shared book categories list
+581f74f add search and status update endpoints
+7303793 add search and category-aware fetch functions
+a99bbcb add search and category actions
+2962a14 restore missing updateBookStatusApi
+d7957a6 add search bar and category filter to dashboard
+6643277 add search and category filtering to browse page
+ee0b50a show category badge on book cards
+d388a62 add category filter pills
+1029f30 add live search with suggestions
+db07683 Add category field to admin book create
+2b09b0e add category field to admin create form
+613b564 redirect homepage Buy Now buttons to login
+d795b50 remove wave emoji from welcome message
+10a19a5 add genre field to sell book form
+218400b add genre field to sell book form
+cae2f17 add owner-scoped update and delete for book listings
+83e0082 add owner-scoped update and delete for book listings
+b2ca4ca add owner-scoped update and delete for book listings
+fd252af add edit and delete listing functionality for sellers
