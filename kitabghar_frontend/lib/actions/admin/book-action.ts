@@ -46,6 +46,8 @@ export async function handleDeleteBook(id: string) {
     const result = await deleteBookApi(id);
     if (result.success) {
       revalidatePath("/admin/books");
+      revalidatePath("/dashboard");
+      revalidatePath("/browse");
       return { success: true, message: result.message };
     }
     return { success: false, message: result.message || "Failed to delete book" };
@@ -60,6 +62,8 @@ export async function handleUpdateBookStatus(id: string, status: "Active" | "Sol
     const result = await updateBookStatusApi(id, status);
     if (result.success) {
       revalidatePath("/admin/books");
+      revalidatePath("/dashboard");
+      revalidatePath("/browse");
       return { success: true, message: result.message };
     }
     return { success: false, message: result.message || "Failed to update status" };
