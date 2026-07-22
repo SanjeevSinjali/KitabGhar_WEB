@@ -6,11 +6,13 @@ import { whoamiAction } from "@/lib/actions/auth-action";
 import { handleGetMyBooks, handleGetFeaturedBooks } from "@/lib/actions/book-action";
 import { handleGetWishlist } from "@/lib/actions/wishlist-action";
 import { handleGetPurchases } from "@/lib/actions/purchase-action";
-import { BookOpen, ShoppingBag, Star, Package, Heart, Search } from "lucide-react";
+import { BookOpen, ShoppingBag, Star, Package, Heart } from "lucide-react";
 import LogoutButton from "@/app/_components/logoutbutton";
 import SellBookModal from "@/app/dashboard/_components/SellBookModal";
 import BrowseBooksSlider from "@/app/dashboard/_components/BrowseBooksSlider";
 import NotificationBell from "@/app/dashboard/_components/NotificationBell";
+import SearchBar from "@/app/dashboard/_components/SearchBar";
+import CategoryFilter from "@/app/dashboard/_components/CategoryFilter";
 
 type MyBook = {
   _id: string;
@@ -36,15 +38,22 @@ function formatRelativeTime(dateStr: string) {
   return date.toLocaleDateString();
 }
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   const user = await whoamiAction();
   if (!user) {
     redirect("/login");
   }
 
+  const query = await searchParams;
+  const category = query.category ? (query.category as string) : "";
+
   const [booksResult, featuredResult, wishlistResult, purchasesResult] = await Promise.all([
     handleGetMyBooks(),
-    handleGetFeaturedBooks({ limit: 6 }),
+    handleGetFeaturedBooks({ limit: 12, category }),
     handleGetWishlist(),
     handleGetPurchases(),
   ]);
@@ -104,9 +113,8 @@ export default async function DashboardPage() {
             <Image src="/kitabghar_logo.png" alt="KitabGhar logo" width={40} height={40} className="rounded-xl object-contain h-auto w-auto" />
             <span className="text-lg font-bold text-slate-900">KitabGhar</span>
           </Link>
-          <div className="hidden md:flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 w-72">
-            <Search size={16} className="text-slate-400" />
-            <input type="text" placeholder="Search books..." className="bg-transparent text-sm outline-none placeholder:text-slate-400 w-full" />
+          <div className="hidden md:block">
+            <SearchBar />
           </div>
           <div className="flex items-center gap-3">
             <NotificationBell />
@@ -166,7 +174,7 @@ export default async function DashboardPage() {
         </div>
 
         <div className="mb-10">
-          <div className="mb-5 flex items-center justify-between">
+          <div className="mb-4 flex items-center justify-between">
             <div>
               <h2 className="text-lg font-semibold text-slate-900">Browse Books</h2>
               <p className="text-sm text-slate-500">Available Books</p>
@@ -174,6 +182,9 @@ export default async function DashboardPage() {
             <Link href="/browse" className="text-sm font-medium text-[#1E3A5F] hover:underline">
               View all
             </Link>
+          </div>
+          <div className="mb-4">
+            <CategoryFilter basePath="/dashboard" />
           </div>
           <BrowseBooksSlider books={featuredBooks} wishlistedIds={wishlistedIds} />
         </div>
