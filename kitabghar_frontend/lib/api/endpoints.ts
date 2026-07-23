@@ -8,7 +8,10 @@ export const ENDPOINTS = {
     UPDATE: `${BASE}/auth/update`,
     REQUEST_PASSWORD_CHANGE: `${BASE}/auth/change-password/request-code`,
     CONFIRM_PASSWORD_CHANGE: `${BASE}/auth/change-password/confirm`,
+    FORGOT_PASSWORD: `${BASE}/auth/forgot-password`,
+    RESET_PASSWORD: `${BASE}/auth/reset-password`,
   },
+
   BOOKS: {
     LIST: `${BASE}/books`,
     CREATE: `${BASE}/books`,
@@ -19,11 +22,13 @@ export const ENDPOINTS = {
     UPDATE: (id: string) => `${BASE}/books/${id}`,
     DELETE: (id: string) => `${BASE}/books/${id}`,
   },
+
   WISHLIST: {
     LIST: `${BASE}/wishlist`,
     TOGGLE: `${BASE}/wishlist/toggle`,
     DELETE: (bookId: string) => `${BASE}/wishlist/${bookId}`,
   },
+
   PURCHASES: {
     LIST: `${BASE}/purchases`,
     CREATE: `${BASE}/purchases`,
@@ -36,6 +41,7 @@ export const ENDPOINTS = {
     MARK_READ: (id: string) => `${BASE}/notifications/${id}/read`,
     MARK_ALL_READ: `${BASE}/notifications/read-all`,
   },
+  
   ADMIN: {
     USERS: {
       LIST: `${BASE}/admin/users`,

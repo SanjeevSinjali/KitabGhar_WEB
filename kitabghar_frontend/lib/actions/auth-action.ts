@@ -149,3 +149,37 @@ export async function confirmPasswordChangeAction(data: { code: string; newPassw
     return { success: false, message: "Something went wrong." };
   }
 }
+
+export async function forgotPasswordAction(email: string) {
+  try {
+    const res = await fetch(`http://localhost:5000${ENDPOINTS.AUTH.FORGOT_PASSWORD}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const result = await res.json() as { success?: boolean; message?: string };
+    if (!res.ok) {
+      return { success: false, message: result.message || "Something went wrong." };
+    }
+    return { success: true, message: result.message || "Code sent" };
+  } catch {
+    return { success: false, message: "Something went wrong." };
+  }
+}
+
+export async function resetPasswordAction(data: { email: string; code: string; newPassword: string }) {
+  try {
+    const res = await fetch(`http://localhost:5000${ENDPOINTS.AUTH.RESET_PASSWORD}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    const result = await res.json() as { success?: boolean; message?: string };
+    if (!res.ok) {
+      return { success: false, message: result.message || "Failed to reset password" };
+    }
+    return { success: true, message: result.message || "Password reset successfully" };
+  } catch {
+    return { success: false, message: "Something went wrong." };
+  }
+}

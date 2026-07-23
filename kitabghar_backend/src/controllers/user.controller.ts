@@ -6,9 +6,11 @@ import {
   LoginSchema,
   RequestPasswordChangeSchema,
   ConfirmPasswordChangeSchema,
+  ForgotPasswordSchema,
+  ResetPasswordSchema,
 } from "../types/user.type";
 import { notifyProfileUpdate } from "../services/notification.service";
-import { sendPasswordChangeCode } from "../utils/mailer";
+import { sendPasswordChangeCode, sendForgotPasswordCode } from "../utils/mailer";
 import User from "../models/user.model";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
@@ -213,6 +215,93 @@ export async function confirmPasswordChange(req: Request, res: Response) {
     }
 
     res.status(200).json({ success: true, message: "Password updated successfully" });
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Something went wrong";
+    res.status(500).json({ message });
+  }
+}
+
+// @desc   Step 1 (logged OUT): email a 6-digit reset code if the email exists
+// @route  POST /api/v1/auth/forgot-password
+// @access Public
+export async function forgotPassword(req: Request, res: Response) {
+  try {
+    const parsed = ForgotPasswordSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ message: parsed.error.issues[0]?.message || "Validation failed" });
+      return;
+    }
+
+    const genericResponse = {
+      success: true,
+      message: "If an account exists with that email, a reset code has been sent.",
+    };
+
+    const user = await User.findOne({ email: parsed.data.email.toLowerCase() }).select(
+      "+passwordChangeCode +passwordChangeCodeExpires"
+    );
+
+    // Don't reveal whether the email exists — respond the same either way.
+    if (!user) {
+      res.status(200).json(genericResponse);
+      return;
+    }
+
+    const code = crypto.randomInt(100000, 999999).toString();
+    const salt = await bcrypt.genSalt(10);
+    user.passwordChangeCode = await bcrypt.hash(code, salt);
+    user.passwordChangeCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
+    await user.save();
+
+    await sendForgotPasswordCode(user.email, code);
+
+    res.status(200).json(genericResponse);
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Something went wrong";
+    res.status(500).json({ message });
+  }
+}
+
+// @desc   Step 2 (logged OUT): verify the code, set new password
+// @route  POST /api/v1/auth/reset-password
+// @access Public
+export async function resetPassword(req: Request, res: Response) {
+  try {
+    const parsed = ResetPasswordSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ message: parsed.error.issues[0]?.message || "Validation failed" });
+      return;
+    }
+
+    const user = await User.findOne({ email: parsed.data.email.toLowerCase() }).select(
+      "+passwordChangeCode +passwordChangeCodeExpires"
+    );
+
+    if (!user || !user.passwordChangeCode || !user.passwordChangeCodeExpires) {
+      res.status(400).json({ message: "Invalid or expired code. Please request a new one." });
+      return;
+    }
+
+    if (user.passwordChangeCodeExpires.getTime() < Date.now()) {
+      res.status(400).json({ message: "This code has expired. Please request a new one." });
+      return;
+    }
+
+    const codeMatches = await bcrypt.compare(parsed.data.code, user.passwordChangeCode);
+    if (!codeMatches) {
+      res.status(400).json({ message: "Invalid verification code" });
+      return;
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(parsed.data.newPassword, salt);
+    user.passwordChangeCode = undefined;
+    user.passwordChangeCodeExpires = undefined;
+    await user.save();
+
+    res.status(200).json({ success: true, message: "Password reset successfully. You can now log in." });
   } catch (error: unknown) {
     const message =
       error instanceof Error ? error.message : "Something went wrong";
