@@ -27,7 +27,10 @@ export const ENDPOINTS = {
   PURCHASES: {
     LIST: `${BASE}/purchases`,
     CREATE: `${BASE}/purchases`,
+    KHALTI_INITIATE: `${BASE}/purchases/khalti/initiate`,
+    KHALTI_VERIFY: `${BASE}/purchases/khalti/verify`,
   },
+
   NOTIFICATIONS: {
     LIST: `${BASE}/notifications`,
     MARK_READ: (id: string) => `${BASE}/notifications/${id}/read`,

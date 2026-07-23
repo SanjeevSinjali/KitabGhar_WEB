@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Heart, X, AlertCircle, CheckCircle2, BookOpen } from "lucide-react";
 import { handleToggleWishlist } from "@/lib/actions/wishlist-action";
-import { handleBuyBook } from "@/lib/actions/purchase-action";
+import { handleInitiateKhaltiPayment } from "@/lib/actions/purchase-action";
 
 export type FeaturedBook = {
   _id: string;
@@ -64,7 +64,7 @@ export default function BrowseBookCard({
 
   function confirmPurchase() {
     startBuyTransition(async () => {
-      const result = await handleBuyBook({
+      const result = await handleInitiateKhaltiPayment({
         bookId: book._id,
         title: book.title,
         author: book.author,
@@ -72,20 +72,22 @@ export default function BrowseBookCard({
         image: book.image,
         condition: book.condition,
       });
-      setConfirmOpen(false);
-      if (!result.success) {
-        setFeedback({ type: "error", message: result.message || "Failed to complete purchase" });
+
+      if (!result.success || !result.data) {
+        setConfirmOpen(false);
+        setFeedback({ type: "error", message: result.message || "Failed to start payment" });
         return;
       }
-      setFeedback({ type: "success", message: `You bought "${book.title}"! Check My Purchases.` });
-      router.refresh();
+
+      // Send the buyer to Khalti's checkout page
+      window.location.href = result.data.payment_url;
     });
   }
 
   return (
     <>
       <div className="group w-40 shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md snap-start sm:w-48">
-        <div className="relative flex aspect-[3/4] w-full items-center justify-center bg-slate-100">
+        <div className="relative flex aspect-3/4 w-full items-center justify-center bg-slate-100">
           {book.image ? (
             <Image
               src={book.image}
@@ -187,6 +189,7 @@ export default function BrowseBookCard({
               Buy <span className="font-medium text-slate-700">&quot;{book.title}&quot;</span> for{" "}
               <span className="font-semibold text-[#1E3A5F]">Rs. {book.price}</span>?
             </p>
+            <p className="mt-1 text-xs text-slate-400">You&apos;ll be redirected to Khalti to complete payment.</p>
             <div className="mt-5 flex gap-3">
               <button
                 onClick={() => setConfirmOpen(false)}
@@ -199,7 +202,7 @@ export default function BrowseBookCard({
                 disabled={isBuying}
                 className="flex-1 rounded-xl bg-[#1E3A5F] py-2.5 text-sm font-medium text-white transition hover:bg-[#162d4a] disabled:opacity-50"
               >
-                {isBuying ? "Buying..." : "Confirm"}
+                {isBuying ? "Redirecting..." : "Pay with Khalti"}
               </button>
             </div>
           </div>

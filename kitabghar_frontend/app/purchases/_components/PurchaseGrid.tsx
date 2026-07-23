@@ -47,7 +47,7 @@ export default function PurchaseGrid({ items }: { items: PurchaseItem[] }) {
           key={item._id}
           className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
         >
-          <div className="relative aspect-[3/4] w-full bg-slate-100">
+          <div className="relative aspect-3/4 w-full bg-slate-100">
             <Image src={item.image} alt={item.title} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover" />
             <span className="absolute top-2 right-2 rounded-full bg-green-500 px-2 py-0.5 text-[10px] font-semibold text-white">
               Purchased

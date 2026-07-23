@@ -39,3 +39,44 @@ export async function fetchPurchasesApi() {
   }
   return res.json();
 }
+
+export async function initiateKhaltiPaymentApi(data: {
+  bookId: string;
+  title: string;
+  author: string;
+  price: string;
+  image: string;
+  condition: string;
+}) {
+  const token = await getTokenCookie();
+  const res = await fetch(`${API_BASE}${ENDPOINTS.PURCHASES.KHALTI_INITIATE}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || "Failed to start payment");
+  }
+  return res.json();
+}
+
+export async function verifyKhaltiPaymentApi(pidx: string) {
+  const token = await getTokenCookie();
+  const res = await fetch(`${API_BASE}${ENDPOINTS.PURCHASES.KHALTI_VERIFY}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ pidx }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || "Failed to verify payment");
+  }
+  return res.json();
+}
