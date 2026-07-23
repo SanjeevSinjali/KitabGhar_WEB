@@ -121,3 +121,33 @@ export async function readMyNotification(userId: string, id: string) {
 export async function readAllMyNotifications(userId: string) {
   await markAllUserNotificationsRead(userId);
 }
+
+export async function notifyPasswordReset(userId: string, userName: string) {
+  const message = `${userName} reset their password via the forgot password flow.`;
+
+  return createNotification({
+    type: "password_reset",
+    message,
+    user: userId,
+    changedFields: ["password"],
+  });
+}
+
+export async function notifyPaymentCompleted(
+  buyerId: string,
+  buyerName: string,
+  bookTitle: string,
+  amount: string,
+  transactionId: string | null
+) {
+  const message = `${buyerName} completed a Khalti payment of ${amount} for "${bookTitle}"${
+    transactionId ? ` (txn: ${transactionId})` : ""
+  }.`;
+
+  return createNotification({
+    type: "payment_completed",
+    message,
+    user: buyerId,
+    changedFields: ["payment"],
+  });
+}

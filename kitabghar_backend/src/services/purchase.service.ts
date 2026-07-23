@@ -5,7 +5,7 @@ import {
   markBookSoldIfActive,
 } from "../repositories/purchase.repository";
 import { removeWishlistEntry } from "../repositories/wishlist.repository";
-import { notifyBookSold } from "./notification.service";
+import { notifyBookSold, notifyPaymentCompleted } from "./notification.service";
 import { khaltiInitiate, khaltiLookup } from "./khalti.service";
 import { createPendingPayment, findPaymentByPidx, updatePaymentStatus } from "../repositories/payment.repository";
 
@@ -23,6 +23,7 @@ export async function buyBook(
   let sellerId: string | null = null;
 
   if (existingBook) {
+    // Atomic check-and-set: only one concurrent request can win this.
     const updatedBook = await markBookSoldIfActive(data.bookId);
     if (!updatedBook) {
       throw Object.assign(new Error("This book has already been sold."), { status: 400 });
@@ -120,6 +121,8 @@ export async function confirmKhaltiPurchase(pidx: string, buyerId: string, buyer
   }
 
   await updatePaymentStatus(pidx, "Completed", result.transaction_id);
+
+  await notifyPaymentCompleted(buyerId, buyerName, payment.title, payment.price, result.transaction_id);
 
   return buyBook(buyerId, buyerName, {
     bookId: payment.bookId,

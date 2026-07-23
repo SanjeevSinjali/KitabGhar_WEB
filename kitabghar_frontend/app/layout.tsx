@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { UserProvider } from "@/context/UserContext";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export const metadata: Metadata = {
   title: "KitabGhar",
@@ -15,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <UserProvider>{children}</UserProvider>
+        <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string}>
+          <UserProvider>{children}</UserProvider>
+        </GoogleOAuthProvider>
       </body>
     </html>
   );

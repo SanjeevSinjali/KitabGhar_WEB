@@ -58,3 +58,7 @@ export const ResetPasswordSchema = z.object({
   code: z.string().length(6, "Enter the 6-digit code"),
   newPassword: z.string().min(6, "New password must be at least 6 characters"),
 });
+
+export const GoogleAuthSchema = z.object({
+  idToken: z.string().min(10, "Invalid Google token"),
+});

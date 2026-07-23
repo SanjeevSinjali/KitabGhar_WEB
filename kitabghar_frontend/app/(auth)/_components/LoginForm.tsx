@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { loginSchema } from "./schema";
 import { loginAction } from "@/lib/actions/auth-action";
+import GoogleAuthButton from "./GoogleAuthButton";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -78,6 +79,16 @@ export default function LoginForm() {
                 {error}
               </div>
             )}
+
+            <div className="mb-5">
+              <GoogleAuthButton onError={setError} />
+            </div>
+
+            <div className="mb-5 flex items-center gap-3">
+              <div className="h-px flex-1 bg-slate-200" />
+              <span className="text-xs font-medium text-slate-400">OR</span>
+              <div className="h-px flex-1 bg-slate-200" />
+            </div>
 
             <form className="space-y-5" onSubmit={handleSubmit}>
               <div>

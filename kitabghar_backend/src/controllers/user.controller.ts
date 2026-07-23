@@ -1,6 +1,6 @@
 import type { Response } from "express";
 import type { Request } from "express-serve-static-core";
-import { registerService, loginService } from "../services/user.service";
+import { registerService, loginService, googleAuthService } from "../services/user.service";
 import {
   RegisterSchema,
   LoginSchema,
@@ -8,8 +8,9 @@ import {
   ConfirmPasswordChangeSchema,
   ForgotPasswordSchema,
   ResetPasswordSchema,
+  GoogleAuthSchema,
 } from "../types/user.type";
-import { notifyProfileUpdate } from "../services/notification.service";
+import { notifyProfileUpdate, notifyPasswordReset } from "../services/notification.service";
 import { sendPasswordChangeCode, sendForgotPasswordCode } from "../utils/mailer";
 import User from "../models/user.model";
 import bcrypt from "bcryptjs";
@@ -57,6 +58,25 @@ export async function login(req: Request, res: Response) {
   } catch (error: unknown) {
     const message =
       error instanceof Error ? error.message : "Something went wrong";
+    res.status(400).json({ message });
+  }
+}
+
+// @desc   Sign in / sign up with a Google ID token
+// @route  POST /api/v1/auth/google
+// @access Public
+export async function googleAuth(req: Request, res: Response) {
+  try {
+    const parsed = GoogleAuthSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ message: parsed.error.issues[0]?.message || "Validation failed" });
+      return;
+    }
+    const result = await googleAuthService(parsed.data.idToken);
+    res.status(200).json(result);
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Google sign-in failed";
     res.status(400).json({ message });
   }
 }
@@ -146,6 +166,11 @@ export async function requestPasswordChange(req: Request, res: Response) {
     const user = await User.findById((req as any).user.id).select("+passwordChangeCode +passwordChangeCodeExpires");
     if (!user) {
       res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    if (!user.password) {
+      res.status(400).json({ message: "This account uses Google sign-in and has no password to change." });
       return;
     }
 
@@ -242,8 +267,8 @@ export async function forgotPassword(req: Request, res: Response) {
       "+passwordChangeCode +passwordChangeCodeExpires"
     );
 
-    // Don't reveal whether the email exists — respond the same either way.
-    if (!user) {
+    if (!user || !user.password) {
+      // Don't reveal whether the email exists, or that it's a Google-only account
       res.status(200).json(genericResponse);
       return;
     }
@@ -300,6 +325,10 @@ export async function resetPassword(req: Request, res: Response) {
     user.passwordChangeCode = undefined;
     user.passwordChangeCodeExpires = undefined;
     await user.save();
+
+    if (user.role !== "admin") {
+      await notifyPasswordReset(String(user._id), user.name);
+    }
 
     res.status(200).json({ success: true, message: "Password reset successfully. You can now log in." });
   } catch (error: unknown) {

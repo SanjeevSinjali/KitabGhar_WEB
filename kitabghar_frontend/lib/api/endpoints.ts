@@ -3,6 +3,7 @@ export const ENDPOINTS = {
   AUTH: {
     LOGIN: `${BASE}/auth/login`,
     REGISTER: `${BASE}/auth/register`,
+    GOOGLE: `${BASE}/auth/google`,
     LOGOUT: `${BASE}/auth/logout`,
     WHOAMI: `${BASE}/auth/whoami`,
     UPDATE: `${BASE}/auth/update`,
@@ -11,7 +12,6 @@ export const ENDPOINTS = {
     FORGOT_PASSWORD: `${BASE}/auth/forgot-password`,
     RESET_PASSWORD: `${BASE}/auth/reset-password`,
   },
-
   BOOKS: {
     LIST: `${BASE}/books`,
     CREATE: `${BASE}/books`,
@@ -22,26 +22,22 @@ export const ENDPOINTS = {
     UPDATE: (id: string) => `${BASE}/books/${id}`,
     DELETE: (id: string) => `${BASE}/books/${id}`,
   },
-
   WISHLIST: {
     LIST: `${BASE}/wishlist`,
     TOGGLE: `${BASE}/wishlist/toggle`,
     DELETE: (bookId: string) => `${BASE}/wishlist/${bookId}`,
   },
-
   PURCHASES: {
     LIST: `${BASE}/purchases`,
     CREATE: `${BASE}/purchases`,
     KHALTI_INITIATE: `${BASE}/purchases/khalti/initiate`,
     KHALTI_VERIFY: `${BASE}/purchases/khalti/verify`,
   },
-
   NOTIFICATIONS: {
     LIST: `${BASE}/notifications`,
     MARK_READ: (id: string) => `${BASE}/notifications/${id}/read`,
     MARK_ALL_READ: `${BASE}/notifications/read-all`,
   },
-  
   ADMIN: {
     USERS: {
       LIST: `${BASE}/admin/users`,

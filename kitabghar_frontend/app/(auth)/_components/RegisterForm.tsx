@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, User, Mail, Lock, ArrowRight, CheckCircle2 } from "lucide-react";
 import { registerSchema } from "./schema";
 import { registerAction } from "@/lib/actions/auth-action";
+import GoogleAuthButton from "./GoogleAuthButton";
 
 const perks = [
   "List your books in under 2 minutes",
@@ -103,7 +104,17 @@ export default function RegisterForm() {
             </div>
           )}
 
-          <form className="mt-7 space-y-5" onSubmit={handleSubmit}>
+          <div className="mt-6">
+            <GoogleAuthButton onError={setError} />
+          </div>
+
+          <div className="my-5 flex items-center gap-3">
+            <div className="h-px flex-1 bg-slate-200" />
+            <span className="text-xs font-medium text-slate-400">OR</span>
+            <div className="h-px flex-1 bg-slate-200" />
+          </div>
+
+          <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-700">Full Name</label>
               <div className="relative">

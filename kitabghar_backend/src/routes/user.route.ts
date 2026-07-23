@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   register,
   login,
+  googleAuth,
   whoami,
   updateProfile,
   requestPasswordChange,
@@ -16,6 +17,7 @@ const router = Router();
 
 router.post("/register", register);
 router.post("/login", login);
+router.post("/google", googleAuth);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
 // Protected routes

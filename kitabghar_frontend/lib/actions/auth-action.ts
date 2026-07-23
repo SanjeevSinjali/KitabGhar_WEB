@@ -183,3 +183,28 @@ export async function resetPasswordAction(data: { email: string; code: string; n
     return { success: false, message: "Something went wrong." };
   }
 }
+
+export async function googleAuthAction(idToken: string) {
+  try {
+    const res = await fetch(`http://localhost:5000${ENDPOINTS.AUTH.GOOGLE}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idToken }),
+    });
+    if (!res.ok) {
+      const error = await res.json() as { message?: string };
+      return { success: false, message: error.message || "Google sign-in failed" };
+    }
+    const data = await res.json() as {
+      token: string;
+      user: { id: string; name: string; email: string; role: string };
+    };
+    await setTokenCookie(data.token);
+    await storeUserData(data.user);
+
+    const redirectTo = data.user.role === "admin" ? "/admin" : "/dashboard";
+    return { success: true, user: data.user, redirectTo };
+  } catch {
+    return { success: false, message: "Something went wrong." };
+  }
+}

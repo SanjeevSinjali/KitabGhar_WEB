@@ -4,8 +4,28 @@ export async function findUserByEmail(email: string): Promise<IUser | null> {
   return User.findOne({ email });
 }
 
+export async function findUserByGoogleId(googleId: string): Promise<IUser | null> {
+  return User.findOne({ googleId });
+}
+
 export async function createUser(name: string, email: string, hashedPassword: string): Promise<IUser> {
-  const user = new User({ name, email, password: hashedPassword });
+  const user = new User({ name, email, password: hashedPassword, provider: "local" });
+  return user.save();
+}
+
+export async function createGoogleUser(data: {
+  name: string;
+  email: string;
+  googleId: string;
+  avatar?: string;
+}): Promise<IUser> {
+  const user = new User({
+    name: data.name,
+    email: data.email,
+    googleId: data.googleId,
+    avatar: data.avatar || null,
+    provider: "google",
+  });
   return user.save();
 }
 
