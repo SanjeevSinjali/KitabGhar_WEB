@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { UserProvider } from "@/context/UserContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import ChatbotWidget from "./_components/ChatbotWidget";
 
 export const metadata: Metadata = {
   title: "KitabGhar",
@@ -17,7 +18,10 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string}>
-          <UserProvider>{children}</UserProvider>
+          <UserProvider>
+            {children}
+            <ChatbotWidget />
+          </UserProvider>
         </GoogleOAuthProvider>
       </body>
     </html>
