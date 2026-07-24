@@ -1,0 +1,37 @@
+services:
+  mongodb:
+    image: mongo:8
+    container_name: kitabghar_mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  backend:
+    build: ./kitabghar_backend
+    container_name: kitabghar_backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./kitabghar_backend/.env
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/kitabghar
+      - FRONTEND_URL=http://localhost:3000
+    depends_on:
+      - mongodb
+
+  frontend:
+    build: ./kitabghar_frontend
+    container_name: kitabghar_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./kitabghar_frontend/.env.local
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:
