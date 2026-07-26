@@ -1,50 +1,76 @@
-const KHALTI_BASE_URL = process.env.KHALTI_BASE_URL || "https://dev.khalti.com/api/v2";
-const KHALTI_SECRET_KEY = process.env.KHALTI_SECRET_KEY as string;
+/**
+ * Server-to-server calls to Khalti's ePayment API (v2).
+ * Docs: https://docs.khalti.com/khalti-epayment/
+ */
 
-interface InitiatePayload {
+const KHALTI_BASE_URL = process.env.KHALTI_BASE_URL || "https://dev.khalti.com/api/v2";
+const KHALTI_SECRET_KEY = process.env.KHALTI_SECRET_KEY;
+
+interface CustomerInfo {
+  name: string;
+  email: string;
+  phone?: string;
+}
+
+interface KhaltiInitiateParams {
   return_url: string;
   website_url: string;
-  amount: number; // paisa
+  amount: number;
   purchase_order_id: string;
   purchase_order_name: string;
-  customer_info?: { name: string; email?: string; phone?: string };
+  customer_info: CustomerInfo;
 }
 
-function extractKhaltiError(data: any): string {
-  if (!data) return "Unknown Khalti error";
-  if (data.detail) return data.detail;
-  // Validation errors look like { "return_url": ["This field may not be blank."], "error_key": "validation_error" }
-  const fieldErrors = Object.entries(data)
-    .filter(([key]) => key !== "error_key")
-    .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(", ") : value}`)
-    .join(" | ");
-  return fieldErrors || "Unknown Khalti error";
+interface KhaltiInitiateResult {
+  pidx: string;
+  payment_url: string;
 }
 
-export async function khaltiInitiate(payload: InitiatePayload) {
+interface KhaltiLookupResult {
+  pidx: string;
+  status: string;
+  transaction_id?: string;
+  total_amount?: number;
+}
+
+export async function khaltiInitiate(
+  params: KhaltiInitiateParams
+): Promise<KhaltiInitiateResult> {
   if (!KHALTI_SECRET_KEY) {
-    throw Object.assign(new Error("KHALTI_SECRET_KEY is not set in the backend .env file."), { status: 500 });
+    throw Object.assign(new Error("Khalti is not configured on the server"), {
+      status: 500,
+    });
   }
 
-  const res = await fetch(`${KHALTI_BASE_URL}/epayment/initiate/`, {
+  const response = await fetch(`${KHALTI_BASE_URL}/epayment/initiate/`, {
     method: "POST",
     headers: {
       Authorization: `key ${KHALTI_SECRET_KEY}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(params),
   });
-  const data = await res.json();
 
-  if (!res.ok) {
-    console.error("Khalti initiate error:", JSON.stringify(data, null, 2));
-    throw Object.assign(new Error(extractKhaltiError(data)), { status: res.status });
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw Object.assign(
+      new Error(data?.detail || "Failed to initiate Khalti payment"),
+      { status: 400 }
+    );
   }
-  return data as { pidx: string; payment_url: string; expires_at: string; expires_in: number };
+
+  return { pidx: data.pidx, payment_url: data.payment_url };
 }
 
-export async function khaltiLookup(pidx: string) {
-  const res = await fetch(`${KHALTI_BASE_URL}/epayment/lookup/`, {
+export async function khaltiLookup(pidx: string): Promise<KhaltiLookupResult> {
+  if (!KHALTI_SECRET_KEY) {
+    throw Object.assign(new Error("Khalti is not configured on the server"), {
+      status: 500,
+    });
+  }
+
+  const response = await fetch(`${KHALTI_BASE_URL}/epayment/lookup/`, {
     method: "POST",
     headers: {
       Authorization: `key ${KHALTI_SECRET_KEY}`,
@@ -52,16 +78,15 @@ export async function khaltiLookup(pidx: string) {
     },
     body: JSON.stringify({ pidx }),
   });
-  const data = await res.json();
 
-  if (!res.ok) {
-    console.error("Khalti lookup error:", JSON.stringify(data, null, 2));
-    throw Object.assign(new Error(extractKhaltiError(data)), { status: res.status });
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw Object.assign(
+      new Error(data?.detail || "Failed to verify Khalti payment"),
+      { status: 400 }
+    );
   }
-  return data as {
-    pidx: string;
-    total_amount: number;
-    status: "Completed" | "Pending" | "Initiated" | "Refunded" | "Expired" | "User canceled";
-    transaction_id: string | null;
-  };
+
+  return data;
 }
