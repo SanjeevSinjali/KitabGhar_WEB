@@ -2,11 +2,22 @@
 
 import { cookies } from "next/headers";
 
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days — matches the JWT's expiresIn
+
+const secureCookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/",
+  maxAge: COOKIE_MAX_AGE,
+};
+
 export async function setTokenCookie(token: string) {
   const cookieStore = await cookies();
   cookieStore.set({
     name: "auth_token",
     value: token,
+    ...secureCookieOptions,
   });
 }
 
@@ -20,6 +31,7 @@ export async function storeUserData(userData: unknown) {
   cookieStore.set({
     name: "user_data",
     value: JSON.stringify(userData),
+    ...secureCookieOptions,
   });
 }
 
@@ -31,6 +43,6 @@ export async function getUserData() {
 
 export async function clearAuthCookies() {
   const cookieStore = await cookies();
-  cookieStore.delete("auth_token");
-  cookieStore.delete("user_data");
+  cookieStore.set({ name: "auth_token", value: "", path: "/", maxAge: 0 });
+  cookieStore.set({ name: "user_data", value: "", path: "/", maxAge: 0 });
 }

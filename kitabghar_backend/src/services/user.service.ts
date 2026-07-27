@@ -65,9 +65,23 @@ export async function googleAuthService(idToken: string): Promise<AuthResponse> 
   let user = await findUserByGoogleId(payload.sub);
 
   if (!user) {
-    // Check if a local account already exists with this email — link it instead of creating a duplicate
     const existingLocal = await findUserByEmail(email);
+
     if (existingLocal) {
+      // IMPORTANT: never silently attach this Google session to an account
+      // that was created with a password by someone else. Doing that blindly
+      // is what caused Google sign-in to land people on a stranger's
+      // account (their name, avatar, and uploads) whenever the email
+      // happened to already exist in the database.
+      if (existingLocal.password) {
+        throw new Error(
+          "An account with this email already exists. Please log in with your email and password instead."
+        );
+      }
+
+      // No password on the existing record means it was itself created via
+      // Google previously (just missing a googleId, e.g. from a migration) —
+      // safe to attach the googleId here.
       existingLocal.googleId = payload.sub;
       if (!existingLocal.avatar && payload.picture) {
         existingLocal.avatar = payload.picture;
