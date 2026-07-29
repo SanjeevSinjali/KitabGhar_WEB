@@ -122,7 +122,7 @@ export async function confirmKhaltiPurchase(pidx: string, buyerId: string, buyer
 
   await updatePaymentStatus(pidx, "Completed", result.transaction_id);
 
-  await notifyPaymentCompleted(buyerId, buyerName, payment.title, payment.price, result.transaction_id);
+  await notifyPaymentCompleted(buyerId, buyerName, payment.title, payment.price, result.transaction_id ?? null);
 
   return buyBook(buyerId, buyerName, {
     bookId: payment.bookId,
